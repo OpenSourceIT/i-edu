@@ -1,0 +1,9 @@
+#!/bin/bash
+
+echo "############################################################"
+echo "# i-EDU CLIENT INSTALLATION"
+echo "#     (c) iteas IT Services GmbH <support@i-edu.at>"
+echo "# 	(c) Robert The-M Matzinger <develop@the-m.at>"
+echo "############################################################"
+sleep 1
+

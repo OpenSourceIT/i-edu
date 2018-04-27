@@ -1,0 +1,70 @@
+#!/bin/bash
+
+VLIZEDETC=/etc/vlizedlab
+VLIZEDROOTFILE=$VLIZEDETC/vlizedroot
+TMPGDIR=$VLIZEDETC/tmp
+
+WGETOPTS="-T 2 -t 1"
+
+_finish () {
+   if [ -f $VLIZEDETC/rootkey/configkey.new.asc ]; then
+        rm -v $VLIZEDETC/rootkey/configkey.new.asc
+   fi
+   if [ -d $TMPGDIR ]; then
+        rm -Rf $TMPGDIR
+   fi
+   chmod 700 $VLIZEDETC/rootkey
+   chmod 600 $VLIZEDETC/rootkey/*
+}
+
+echo "##########################################################"
+echo "### REBRANDING CLIENT TO NEW 'VLIZEDLAB ROOT' HOST KEY ###"
+echo "Root Server candidates are:"
+echo "----------"
+cat $VLIZEDROOTFILE
+echo "----------"
+echo "You may want to edit $VLIZEDROOTFILE before"
+echo -n "Do you want to continue rebranding? [Y/n]"
+
+read IN
+if [ "$IN" != "y" -a "$IN" != "Y" ]; then exit 0; fi
+
+for host in `cat /etc/vlizedlab/vlizedroot | grep -v '^#'` ; do
+   echo "Trying http://$host/configkey.asc"
+
+   wget $WGETOPTS -O $VLIZEDETC/rootkey/configkey.new.asc http://$host/configkey.asc
+   if [ $? = 0 -a -f $VLIZEDETC/rootkey/configkey.new.asc ]; then
+       mkdir -p $TMPGDIR
+       chmod 700 $TMPGDIR
+       cat $VLIZEDETC/rootkey/configkey.new.asc | gpg -q --homedir $TMPGDIR --import
+       if [ $? = 0 ]; then
+          echo "### root key found at http://$host/configkey.asc"
+          echo "gpg fingerprint is:" 
+          gpg --homedir $TMPGDIR --fingerprint
+          echo "----------"
+          echo -n "Do you want to take this new key? [y/N]"
+          read IN
+          if [ "$IN" = "y" -o "$IN" = "Y" ]; then
+              mv -v $VLIZEDETC/rootkey/configkey.asc $VLIZEDETC/rootkey/configkey.old.asc
+              mv -v $VLIZEDETC/rootkey/configkey.new.asc $VLIZEDETC/rootkey/configkey.asc
+              _finish
+              echo "OK. VLIZEDLAB ROOT SERVER REBRANDED"
+              exit 0
+          else
+              _finish
+          fi
+       fi
+       _finish
+   else
+       _finish
+       echo "Nothing found at http://$host/configkey.asc"
+   fi
+
+done
+
+echo "ERROR: REBRANDING TO VLIZEDLAB ROOT SERVER FAILED"
+echo "old /etc/vlidelab/rootkey/configkey.asc kept."
+echo "nothing has changed"
+
+exit 1
+

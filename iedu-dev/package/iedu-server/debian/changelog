@@ -1,0 +1,11 @@
+iedu-server (3.3-27) testing; urgency=low
+
+  * Dev update
+
+-- Rene Hadler <rene.hadler@iteas.at> Mon, 12 Feb 2018 15:34:00 +0200
+
+iedu-server (3.3-1) testing; urgency=low
+
+  * Package release
+
+-- Rene Hadler <rene.hadler@iteas.at> Wed, 1 Feb 2018 9:34:00 +0200

@@ -1,0 +1,28 @@
+#! /bin/bash
+
+# Orig:
+#if [ -n "$APTPROXY" ]; then
+#    echo "Acquire::http::Proxy \"$APTPROXY\";" > $target/etc/apt/apt.conf.d/02proxy
+#else
+#    rm -f $target/etc/apt/apt.conf.d/02proxy
+#fi
+
+if [ -n "$APTPROXY" ]; then
+    echo "Acquire::http::Proxy \"$APTPROXY\";" > $target/etc/apt/apt.conf.d/02proxy
+elif ( echo '' | telnet 10.70.100.251 3142 2> /dev/null | grep -q 'Connected to' ); then
+    echo "Found apt-cacher at 10.70.100.251; setting proxy"
+    echo 'Acquire::http::Proxy "http://10.70.100.251:3142";' > $target/etc/apt/apt.conf.d/02proxy
+elif ( echo '' | telnet vlizedlabroot 3142 2> /dev/null | grep -q 'Connected to' ); then
+    echo "Found apt-cacher at vlizedlabroot; setting proxy"
+    echo 'Acquire::http::Proxy "http://vlizedlabroot:3142";' > $target/etc/apt/apt.conf.d/02proxy
+else
+    rm -f $target/etc/apt/apt.conf.d/02proxy
+fi
+
+echo force-unsafe-io > $target/etc/dpkg/dpkg.cfg.d/unsafe-io
+
+# you may want to add i386 arch to amd64 hosts
+# if ifclass AMD64; then
+#     $ROOTCMD dpkg --add-architecture i386
+# fi
+#!/bin/bash

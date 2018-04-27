@@ -1,0 +1,30 @@
+<%#
+name: i-EDU Finish
+snippet: false
+model: ProvisioningTemplate
+kind: finish
+oses:
+- i-EDU-Ubuntu
+%>
+#!/bin/sh
+
+<%= snippet 'fix_hosts' %>
+
+wget --no-check-certificate http://10.70.100.251/apt/all/puppetlabs-release-pc1-xenial.deb 2>/dev/null
+dpkg -i puppetlabs-release-pc1-xenial.deb 2>/dev/null
+apt update 2>/dev/null
+apt-get install puppet-agent 2>/dev/null
+
+cat > /etc/puppetlabs/puppet/puppet.conf << EOF
+<%= snippet 'puppet.conf' -%>
+EOF
+
+/opt/puppetlabs/bin/puppet agent --config /etc/puppetlabs/puppet/puppet.conf -o --tags no_such_tag --server <%= @host.puppetmaster %> --no-daemonize
+#/usr/bin/wget -q -O /dev/null --no-check-certificate <%= foreman_url %>
+/opt/puppetlabs/bin/puppet agent --enable
+/opt/puppetlabs/bin/puppet agent --test
+
+
+systemctl enable puppet
+
+exit 0

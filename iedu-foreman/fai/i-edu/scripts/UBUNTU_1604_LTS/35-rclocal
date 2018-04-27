@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# fcopy −Bm root,root,755 /etc/rc.local # does not work :(
+fcopy -BMiv /etc/rc.local
+chmod 755 $target/etc/rc.local
+

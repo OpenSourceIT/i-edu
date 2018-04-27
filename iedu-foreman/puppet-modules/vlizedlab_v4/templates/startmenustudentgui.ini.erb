@@ -1,0 +1,30 @@
+[main]
+#sound = yes
+#greeting = "Willkommen Schüler"
+<% if @has_beamer == true -%>
+beamer = yes
+beamer_output = <%=@beamer_output%>
+<% end -%>
+<% if @screensaver == true -%>
+screensaver = yes
+<% end -%>
+<% if @umountusb == true -%>
+umountusb = yes
+<% end -%>
+<% if @umountusb == false -%>
+umountusb = no
+<% end -%>
+<% if @copycd == true -%>
+copycd = yes
+<% end -%>
+<% if @copycd == false -%>
+copycd = no
+<% end -%>
+
+[program]
+#teamviewer = yes
+#teamviewer_cmd = teamviewer
+#terminal = yes
+terminal_cmd = xfce4-terminal --hide-menubar --command "sudo login" > /dev/null 2>&1 &
+#browser = yes
+browser_cmd = google-chrome-stable

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=i-EDU Manager
+Comment=GUI for i-EDU management tasks
+Icon=/usr/share/pixmaps/iedu_manage.png
+Exec=/usr/bin/iEDUManager-pkexec
+Terminal=false
+Categories=Network;Application;

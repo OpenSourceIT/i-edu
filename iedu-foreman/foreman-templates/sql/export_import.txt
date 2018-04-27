@@ -1,0 +1,6 @@
+Export SQL:
+---------------
+pg_dump --host localhost --port 5432 --username "foreman" --format plain --section data --verbose --file "foreman_operatingsystems.sql" --table "public.operatingsystems" "foreman"
+
+Import SQL:
+- su postgres -c "psql -U postgres -d foreman -1 -f /tmp/tmp.sql"

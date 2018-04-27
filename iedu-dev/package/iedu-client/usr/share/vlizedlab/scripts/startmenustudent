@@ -1,0 +1,131 @@
+#!/bin/bash
+# normally started as user Student within X
+
+VLCOMMON=/usr/share/vlizedlab/scripts/common
+if [ -f $VLCOMMON ]; then source $VLCOMMON ; else exit 1; fi
+
+TITLE="VlizedlabClient (c)the-M `_version` - `hostname`"
+sleep 1
+
+#_startvm () {
+#     if [ -d $VMHOME/$1 ]; then
+#        echo "Starting  Virtual Machine vms/$1"
+#
+#	VMFILE="`find $VMHOME/$1 -name '*.vmx' -print | head -1`"
+#	vmplayer "$VMFILE" 2>&1 > /dev/null &
+#	echo "starting ..."
+#
+#	sleep 5
+#
+#	echo "Started."
+#     fi
+#}
+
+# vlsetresolution auto # is done in .xinitrc
+
+DOEXIT=no
+
+while [ "$DOEXIT" != yes ]; do
+
+	#MENU="0 _A_L_L_"
+	MENU="0 Aktualisiere_VMs"
+	NR=1
+#	for XC in `X $VBHOME -maxdepth 1 -type d -print` ; do
+# 	for FF in `find $VBHOME -maxdepth 2 -type f -name '*.sh' -exec grep -H VERSION=$VBSCRIPTVERSION {} \;` ; do
+	for XC in \
+   `find $VBHOME -maxdepth 2 -a -type f -a \( -name '*.sh' -o -name '*.vdi' \) -exec dirname {} \; \
+    | sort -u ` ;
+        do
+#	   SC=`echo $FF | awk -F: '{print $1}'`
+#	   XC=`dirname $SC`
+	   MNAME=`basename $XC`
+	   MDIR=`dirname $XC`
+	   MTOOL=`basename $MDIR`
+	   MENU="$MENU $NR Starte_VM_${MNAME}"
+#	   MENU="$MENU $NR $MNAME"
+	   NR=`expr $NR + 1`
+	done
+
+	MENU="$MENU um Aktuelles_Wechselmedium_aushaengen uma Alle_Wechselmedien_aushaengen te TeamViewer gt Terminal ch Browser t Beende_X"
+
+
+	choice=`dialog --cr-wrap \
+                  --backtitle "$TITLE" \
+	          --menu 'Bitte Eintrag waehlen der gestartet werden soll.' 0 0 0 $MENU 3>&1 1>&2 2>&3`
+
+	clear
+
+	#echo "Updating Virtual Machine $choice"
+
+	case $choice in 
+	   0)
+	     echo "Aktualisiere VMs."
+	     echo "warten..."
+	     sleep 1
+	     echo "OK."
+	     ;;
+	   [1-9]|[0-9][0-9])
+	     VM="" 
+	     NR=1
+#	     for FF in `find $VBHOME -maxdepth 2 -type f -name '*.sh' -exec grep -H VERSION=$VBSCRIPTVERSION {} \;` ; do
+#	       SC=`echo $FF | awk -F: '{print $1}'`
+#	       XC=`dirname $SC`
+	     for XC in \
+   `find $VBHOME -maxdepth 2 -a -type f -a \( -name '*.sh' -o -name '*.vdi' \) -exec dirname {} \; \
+    | sort -u ` ;
+             do
+	       if [ "$NR" = "$choice" ]; then
+	          MNAME=`basename $XC`
+	          MDIR=`dirname $XC`
+	          MTOOL=`basename $MDIR`
+	       fi
+	       NR=`expr $NR + 1`
+	     done
+	     
+	     if [ "$MTOOL" = vb ]; then
+	       vlstartvbmachine $MTOOL/$MNAME
+#	     elif [ "$MTOOL" = vbox ]; then
+#	       _startvbox $MNAME
+	     fi
+	     echo "warten..."
+	     sleep 1
+	     ;;
+	   um)
+	     clear
+             devmon --unmount-recent
+	     sleep 2
+             ;;
+	   uma)
+	     clear
+             devmon --unmount-all
+	     sleep 2
+             ;;
+	   vv) 
+             sudo /usr/sbin/vlviewremote -viewonly
+             ;;
+	   v) 
+             sudo /usr/sbin/vlviewremote
+             ;;
+	   sr) 
+             vlsetresolution menu
+             ;;
+	   te)
+	     teamviewer > /dev/null 2>&1 &
+	     ;;
+	   gt)
+	     xfce4-terminal --hide-menubar --command "sudo login" > /dev/null 2>&1 &
+	     ;;
+	   ch)
+	     chromium > /dev/null 2>&1 &
+	     ;;
+	   t) 
+             DOEXIT=yes
+             ;;
+	esac
+done
+
+#for ff in `ps augx | grep vmware | grep /space/vms | awk '{print $1}'` ; do
+#    kill $ff
+#done
+
+

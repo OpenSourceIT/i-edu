@@ -1,0 +1,19 @@
+#########################
+
+PACKAGES aptitude
+# ion3
+consolekit
+policykit-1
+udisks2
+# virtualbox
+iedu-client
+udpcast
+psmisc
+screen
+x11vnc
+xtightvncviewer
+ntfs-3g
+wget
+them-bashrc
+xfsprogs
+apt-transport-https

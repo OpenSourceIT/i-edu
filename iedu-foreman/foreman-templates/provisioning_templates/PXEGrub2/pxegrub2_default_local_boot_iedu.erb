@@ -1,0 +1,12 @@
+<%#
+name: PXEGrub2 default local boot i-edu
+snippet: false
+model: ProvisioningTemplate
+kind: PXEGrub2
+%>
+<%# Used to boot provisioned hosts, do not associate or change the name. %>
+
+set default=0
+set timeout=2
+
+<%= snippet "IteasTpl-pxegrub2_chainload_i-edu" %>

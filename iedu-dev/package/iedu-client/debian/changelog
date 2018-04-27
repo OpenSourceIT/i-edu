@@ -1,0 +1,17 @@
+iedu-client (3.3-15) testing; urgency=low
+
+  * Package via dev files
+
+-- Rene Hadler <rene.hadler@iteas.at> Wed, 1 Feb 2018 9:33:00 +0200
+
+iedu-client (3.3-3) testing; urgency=low
+
+  * Package release
+
+-- Rene Hadler <rene.hadler@iteas.at> Wed, 31 Jan 2018 10:10:00 +0200
+
+iedu-client (3.3-1) testing; urgency=low
+
+  * Package release
+
+-- Rene Hadler <rene.hadler@iteas.at> Wed, 30 Jan 2018 10:20:00 +0200

@@ -1,0 +1,43 @@
+#########################
+
+PACKAGES aptitude
+dkms
+virt-what
+
+# from virtualbox/.../control
+#libc6
+#libcurl3
+#libgcc1
+#libpng12-0
+#libpython2.7
+#libqtcore4
+#libqtgui4
+#libsdl1.2debian
+#libssl1.0.0
+#libstdc++6
+#libvncserver0
+#libx11-6
+#libxcursor1
+#libxext6
+#libxml2
+#libxmu6
+#libxt6
+#zlib1g
+#python
+#python-central
+#adduser
+#libgl1-mesa-glx
+#  | libgl1
+#libqt4-opengl
+# for virtualbox-dkms
+# linux-source
+# dkms
+# for virtualbox-qt
+#libqt4-network
+
+PACKAGES aptitude I386
+linux-headers-486
+linux-headers-686-pae
+
+PACKAGES aptitude AMD64
+linux-headers-generic-hwe-16.04

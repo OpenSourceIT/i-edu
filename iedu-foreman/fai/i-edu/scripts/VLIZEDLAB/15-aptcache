@@ -1,0 +1,18 @@
+#!/bin/bash
+
+#is set with config
+if [ ! -f /etc/apt/apt.conf.d/02proxy ]; then
+#   if ( echo '' | telnet aptcache 3142 2> /dev/null | grep -q 'Connected to' ); then
+#       echo "Found apt-cacher at aptcache; setting proxy"
+#       echo 'Acquire::http::Proxy "http://aptcache:3142";' > $target/etc/apt/apt.conf.d/02proxy
+   if ( echo '' | telnet 10.70.100.251 3142 2> /dev/null | grep -q 'Connected to' ); then
+       echo "Found apt-cacher at 10.70.100.251; setting proxy"
+       echo 'Acquire::http::Proxy "http://10.70.100.251:3142";' > $target/etc/apt/apt.conf.d/02proxy
+   elif ( echo '' | telnet vlizedlabroot 3142 2> /dev/null | grep -q 'Connected to' ); then
+       echo "Found apt-cacher at vlizedlabroot; setting proxy"
+       echo 'Acquire::http::Proxy "http://vlizedlabroot:3142";' > $target/etc/apt/apt.conf.d/02proxy
+   else
+       echo "No apt-cacher found"
+       echo '// Acquire::http::Proxy "http://aptcache:3142";' > $target/etc/apt/apt.conf.d/02proxy
+   fi
+fi

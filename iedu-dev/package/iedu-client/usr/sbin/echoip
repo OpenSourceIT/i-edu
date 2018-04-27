@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# ( ifconfig eth0 2> /dev/null ; ifconfig eth1 2> /dev/null ) | sed -n 2p | cut -d ":" -f2 | cut -d " " -f1 2> /dev/null
+# ( for I in `/bin/ls /sys/class/net | grep -v lo`; do ifconfig $I | sed -n 2p ; done ) 2> /dev/null | head -1 | cut -d ":" -f2 | cut -d " " -f1 2> /dev/null
+( /sbin/ifconfig | grep inet | sed '1,$ s/\:/ /g; s/\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\)/@\1/' | \
+        grep @ | cut -d @ -f2 | cut -d ' ' -f1 | \
+        grep -v 127.0.0.1 | head -1 ) 2>/dev/null

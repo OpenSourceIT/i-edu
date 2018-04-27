@@ -1,0 +1,50 @@
+#!/bin/bash
+# Scripts for vlizedlab
+# designed be sourced
+
+VLSCRIPTVERSION=/usr/share/vlizedlab/version
+VLCONFIGVERSION=/etc/vlizedlab/configdate
+VLSCRIPTDIR=/usr/share/vlizedlab/scripts
+
+MYSTUDENTLIST=/etc/vlizedlab/mystudentlist
+VLVNCPASSWD=/usr/share/vlizedlab/data/passwd
+
+VLSOURCELIST=/etc/vlizedlab/vmsources
+
+VBHOME=/vm/vb
+VBSCRIPTVERSION=2
+
+WGETOPTS="-T 2 -t 1"
+RSYNCOPTS="-vrptlO -z --progress --contimeout=3"
+
+_version () {
+   if [ -f $VLSCRIPTVERSION ]; then
+      SVERSION=`cat $VLSCRIPTVERSION`
+   else
+      SVERSION=unknown
+   fi
+
+   if [ -f $VLCONFIGVERSION ]; then
+      CVERSION=`cat $VLCONFIGVERSION`
+   else
+      CVERSION=unknown
+   fi
+   echo "$SVERSION;$CVERSION"
+}
+
+
+_nyi () {
+	clear
+	echo ""
+	echo ""
+	echo "Not yet implemented"
+	sleep 1
+	clear
+}
+
+if [ "`whoami`" = "root" ]; then
+   VLTITLE="VlizedlabClient (c)the-M `_version` - `echoip`"
+else
+   VLTITLE="VlizedlabClient (c)the-M `_version`"
+fi
+# VLTITLELONG="VlizedlabClient (c)the-M `_version` - `hostname`"

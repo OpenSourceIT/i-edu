@@ -1,0 +1,18 @@
+#!/bin/bash
+
+sleep 1
+
+if [ -x /etc/installonfirstboot.sh ]; then
+	echo "Starte Installscript, bitte warten..."
+	/etc/installonfirstboot.sh >>/etc/vlizedlab/installonfirstboot.log 2>&1
+fi
+
+##SCRIPT=/usr/share/vlizedlab/scripts/startmenu
+# SCRIPT=/usr/share/vlizedlab/scripts/startmenumaint
+
+#if [ -x $SCRIPT ]; then
+#    $SCRIPT
+#else
+#    login
+#fi
+

@@ -1,0 +1,19 @@
+#!/bin/sh
+
+case "$1" in
+  install|upgrade)
+    mkdir -p /root/.ssh
+    chmod 700 /root/.ssh
+    ;;
+
+  abort-upgrade)
+    ;;   
+
+*)
+    echo "preinst called with unknown argument '$1'" >&2
+    exit 1
+    ;;
+esac
+
+exit 0
+

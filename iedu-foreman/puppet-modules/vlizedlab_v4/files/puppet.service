@@ -1,0 +1,15 @@
+[Unit] 
+Description=Puppet agent 
+Requires=network.target 
+
+
+[Service] 
+Type=forking 
+EnvironmentFile=-/etc/default/puppet 
+PIDFile=/run/puppet/agent.pid 
+ExecStartPre=/bin/sleep 15
+ExecStart=/usr/bin/puppet agent $DAEMON_OPTS 
+
+[Install] 
+WantedBy=multi-user.target
+

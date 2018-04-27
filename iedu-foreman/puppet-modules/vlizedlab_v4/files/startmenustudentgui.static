@@ -1,0 +1,5 @@
+# Statische Element für Startmenü, Format:
+# programmname,befehl,icon
+# zb. Texteditor,gedit,/usr/share/icons/Humanity/apps/48/gedit-logo.svg
+# wenn icon "default" ist wird ein Standard Icon genommen
+#SuperTuxKart,supertuxkart,/usr/share/icons/hicolor/128x128/apps/supertuxkart.png

@@ -1,0 +1,24 @@
+#!/bin/bash
+
+VLCOMMON=/usr/share/vlizedlab/scripts/common
+if [ -f $VLCOMMON ]; then source $VLCOMMON ; else exit 1; fi
+
+IP=`$VLSCRIPTDIR/chooseoneip`
+CHAN=`echo $IP | md5sum | sed '1,$ s/[^0-9]//g' | cut -c 1-3`
+
+if [ "$1" = "-viewonly" ]; then
+   VIEWONLY="-viewonly"
+else
+   VIEWONLY=
+fi
+
+if [ "$IP" != "" -a "$IP" != "none" ]; then
+   ssh -YCf -L 5$CHAN:localhost:5900 -o ServerAliveCountMax=100000 -o ServerAliveInterval=30 root@$IP "sleep 20"
+   xtightvncviewer $VIEWONLY -encodings "copyrect tight hextile zlib corre rre" \
+           localhost::5$CHAN 2>&1 \
+           > /dev/null &
+# -passwd $VLVNCPASSWD 
+   sleep 2
+   clear
+fi
+

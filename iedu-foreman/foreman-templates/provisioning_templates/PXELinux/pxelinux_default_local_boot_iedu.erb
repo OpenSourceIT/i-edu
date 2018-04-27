@@ -1,0 +1,16 @@
+<%#
+name: PXELinux default local boot i-edu
+snippet: false
+model: ProvisioningTemplate
+kind: PXELinux
+%>
+<%# Used to boot provisioned hosts, do not associate or change the name. %>
+
+DEFAULT menu
+PROMPT 0
+MENU TITLE PXE Menu
+TIMEOUT 20
+TOTALTIMEOUT 6000
+ONTIMEOUT local
+
+<%= snippet "pxelinux_chainload" %>

@@ -1,0 +1,66 @@
+#!/bin/bash
+# Just hardens the Computer.
+
+PATH=/usr/sbin:/sbin:/bin:/usr/bin
+
+  # Strictly no IPV6
+  ip6tables -F
+  ip6tables -t nat -F
+  ip6tables -t mangle -F
+  ip6tables -X
+  ip6tables -P INPUT DROP
+  ip6tables -P OUTPUT DROP
+  ip6tables -P FORWARD DROP
+  ip6tables -I INPUT -j DROP
+  ip6tables -P INPUT DROP
+  ip6tables -I OUTPUT -j DROP
+  ip6tables -P OUTPUT DROP
+  ip6tables -I FORWARD -j DROP
+  ip6tables -P FORWARD DROP
+
+# delete all existing rules.
+#
+iptables -F
+iptables -t nat -F
+iptables -t mangle -F
+iptables -X
+
+# Always accept loopback traffic
+iptables -A INPUT -i lo -j ACCEPT
+
+# Allow established connections, and those not coming from the outside
+iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+# iptables -A INPUT -m state --state NEW -j ACCEPT
+
+# http://www.debian-administration.org/articles/187
+# Making ssh secure:
+iptables -I INPUT -p tcp --dport 22 -m state --state NEW -m recent --set
+iptables -I INPUT -p tcp --dport 22 -m state --state NEW -m recent --update --seconds 60 --hitcount 10 -j DROP
+iptables -I INPUT -p tcp --dport 22 -m state --state NEW -m recent --update --seconds 60 --hitcount 10 -j LOG --log-prefix "iptables ssh BLOCKING: "
+
+# Allow certain incoming connections, drop the rest:
+#ping
+iptables -A INPUT -p icmp --icmp-type 8 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+
+#ssh (port 22)
+iptables -A INPUT -p tcp --dport 22 -j LOG --log-prefix "iptables ssh ACCEPTING: "
+iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+
+#udpcast (port 9000+9001)
+iptables -A INPUT -p tcp --dport 9000 -j LOG --log-prefix "udpcast ACCEPTING: "
+iptables -A INPUT -p tcp --dport 9000 -j ACCEPT
+
+iptables -A INPUT -p tcp --dport 9001 -j LOG --log-prefix "udpcast ACCEPTING: "
+iptables -A INPUT -p tcp --dport 9001 -j ACCEPT
+
+iptables -A INPUT -p udp --dport 9000 -j ACCEPT
+iptables -A INPUT -p udp --dport 9001 -j ACCEPT
+
+# Drop the Rest
+# iptables -A INPUT -j LOG
+iptables -A INPUT -j DROP
+
+# Dont Enable routing.
+echo 0 > /proc/sys/net/ipv4/ip_forward
+
+

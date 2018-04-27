@@ -1,0 +1,14 @@
+#!/bin/bash
+
+####### Postinstall Network Configuration
+NICW=`ifconfig -a | grep '^[a-z0-9]*' | grep -v lo | awk -F: '{print $1}' | head -1 | awk -F" " '{print $1}'`
+IF=/etc/network/interfaces
+
+if ! grep -q $NICW $IF ; then 
+	echo "auto $NICW" >> $IF
+	echo "iface $NICW inet dhcp" >> $IF
+	ifup $NICW
+	sleep 1
+fi
+
+exit 0

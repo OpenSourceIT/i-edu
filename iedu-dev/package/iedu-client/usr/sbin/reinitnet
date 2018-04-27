@@ -1,0 +1,18 @@
+#!/bin/bash
+
+_reinitnet() { # $1=interface
+   if [ 0 != `ifconfig $1 2>&1 | grep $1 | wc -l` ]; then
+       echo "re-initialising network interface $1"
+       ifdown $1
+       ifup $1
+       echo "re-initialising network interface $1 finished, network configuration is now:"
+       ifconfig $1
+       echo "re-initialising network interface $1 done."
+       sleep 4
+   fi
+}
+
+# for ff in eth0 eth1 eth2 ; do
+for ff in `/bin/ls /sys/class/net | grep -v lo` ; do
+   _reinitnet $ff
+done

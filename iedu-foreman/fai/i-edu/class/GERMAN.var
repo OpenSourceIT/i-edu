@@ -1,0 +1,3 @@
+# german environment (for Ubuntu)
+KEYMAP=de-latin1-nodeadkeys
+

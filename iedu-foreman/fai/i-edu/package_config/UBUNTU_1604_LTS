@@ -1,0 +1,25 @@
+PACKAGES install I386
+linux-image-generic-hwe-16.04 initramfs-tools
+linux-firmware
+memtest86+
+
+PACKAGES install CHROOT
+linux-image-686-pae-
+linux-image-amd64-
+
+PACKAGES install AMD64
+linux-image-generic-hwe-16.04 initramfs-tools
+linux-firmware
+memtest86+
+
+PACKAGES install DHCPC
+isc-dhcp-client
+
+PACKAGES install GRUB_PC
+grub-pc lilo-
+
+PACKAGES install LVM
+lvm2
+
+PACKAGES aptitude UEFI
+grub-pc- grub-efi-amd64  grub-efi-amd64-bin

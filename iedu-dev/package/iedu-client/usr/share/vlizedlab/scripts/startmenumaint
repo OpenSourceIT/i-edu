@@ -1,0 +1,82 @@
+#!/bin/bash
+
+VLCOMMON=/usr/share/vlizedlab/scripts/common
+if [ -f $VLCOMMON ]; then source $VLCOMMON ; else exit 1; fi
+
+while [ -f /tmp/maintlock ]; do
+    sleep 1
+    echo -n '.'
+done
+
+choice=0
+
+while [ "$choice" != "x" ]; do
+
+	choice=`dialog --cr-wrap \
+                  --backtitle "$VLTITLE"\
+	          --nocancel \
+	          --menu 'Maintenance - Please choose what to do:' 0 0 0 \
+			  n 're-initialize network connection' \
+	                  ux '(re)load Virtualbox virtual machines' \
+	                  d 'delete virtual machines' \
+	                  c 'update configuration' \
+	                  a 'update vlizedlab scripts' \
+	                  us 'send virtual machine(s) via udpcast' \
+	                  ur 'receive virtual machine(s) via udpcast' \
+                          r '-> remote machine maintenance ...' \
+	                  l 'login' \
+	                  f 'refresh menu' \
+	                  x '... back to main menu' \
+	                   3>&1 1>&2 2>&3 `
+
+#		          b 'start "bash" as student' \
+
+
+	clear
+
+	case $choice in
+	  n) 
+	    reinitnet
+	    ;;
+	  ux) 
+	    vlreloadvms
+	    ;;
+	  d) 
+	    vldeletevms
+	    ;;
+	  us) 
+	    vludpsendVMs
+	    ;;
+	  ur) 
+	    vludpreceiveVMs
+	    ;;
+	  r) 
+	    /usr/share/vlizedlab/scripts/startmenuremote
+	    ;;
+	  c) 
+	    echo 'Vlizedlab Client Host - Updating Configuration'
+	    vlreconfig
+	    sleep 1
+	    ;;
+	  a) 
+	    echo 'Vlizedlab Client Host - Update Scripts'
+	    echo '     Update by upgrading package vlizedlab-client ... '
+	    apt-get update
+	    apt-get -y install vlizedlab-client
+	    sleep 1
+	    ;;
+#	  b) 
+#	    echo "$VLTITLE"
+#	    echo 'Type "exit" to return to the login menu'
+#	    su student -c /bin/bash -l
+#	    ;;
+	  l) 
+	    echo "$VLTITLE"
+	    login
+	    ;;
+	  x|f) 
+	    true
+	    ;;
+	esac
+
+done

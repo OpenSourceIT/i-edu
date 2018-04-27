@@ -1,0 +1,83 @@
+#!/bin/bash
+
+# Show install screen
+cp /home/student/.config/i3/config-firstboot /home/student/.config/i3/config
+
+_wait () {
+   while ! ( route | grep -q default ) ; do
+     echo "installonfirstboot.sh waiting for network ..."
+     sleep 2
+   done
+}
+
+# We are waiting for internet !!!
+_wait
+
+sleep 3
+
+# Installs Virtualbox
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 2FAB19E7CCB7F415
+apt-key adv --recv-keys --keyserver keyserver.ubuntu.com A2F683C52980AECF
+
+# SymLink for maintenance tools
+ln -s /usr/share/vlizedlab/scripts/startmenumaint /usr/local/bin/startmenumaint
+
+# Installs further tools
+apt update
+/bin/sh -c "echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections"
+apt-get -y install apt-transport-https
+apt-get -y install epoptes-client gnome-terminal ttf-mscorefonts-installer xfsprogs nfs-common htop mesa-utils nload nano ubuntu-drivers-common
+
+ubuntu-drivers autoinstall
+
+cat <<EOT > /etc/default/epoptes-client
+# The server where epoptes-client will be connecting to.
+# If unset, thin client user sessions running on the server will try to connect
+# to "localhost", while thin client root sessions and fat or standalone clients
+# will try to connect to "server".
+# LTSP automatically puts "server" in /etc/hosts for thin and fat clients,
+# but you'd need to put "server" in DNS manually for standalone clients.
+SERVER=10.70.100.251
+
+# The port where the server will be listening on, and where the client will try
+# to connect to. For security reasons it defaults to a system port, 789.
+#PORT=789
+
+# Set Wake On LAN for devices that support it. Comment it out to disable it.
+WOL=g
+EOT
+
+systemctl restart epoptes-client
+epoptes-client -c
+systemctl restart epoptes-client
+
+# Install Intel driver
+apt-get -y install xserver-xorg-video-intel
+
+# Set locales
+locale-gen de_DE.UTF-8
+locale-gen en_US.UTF-8
+update-locale LANG=de_DE.UTF-8
+
+# Autoload VMs
+/etc/autoload_vms.sh
+
+# Execute Foreman finish if existing
+/etc/vlizedlab/foreman_finish.sh
+
+# Delete ontime files
+mv /etc/installonfirstboot.sh /etc/installonfirstboot.sh-finish
+#rm -f /etc/autoload_vms.sh
+#rm -f /etc/vlizedlab/foreman_finish.sh
+
+if [ -f /etc/vlizedlab/postinst.notyet ]; then
+   mv /etc/vlizedlab/postinst.notyet /etc/vlizedlab/postinst
+   /etc/vlizedlab/postinst
+fi
+
+# Revert to startmenu
+cp /home/student/.config/i3/config-student /home/student/.config/i3/config
+
+shutdown -r now

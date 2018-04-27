@@ -1,0 +1,89 @@
+#!/bin/bash
+# Called with $1 e.g. vb/MACHINE
+
+echo "Starting Virtual Machine $1"
+
+VLCOMMON=/usr/share/vlizedlab/scripts/common
+if [ -f $VLCOMMON ]; then source $VLCOMMON ; else exit 1; fi
+
+export MACHINE=`basename $1`
+METHOD=`dirname $1`
+
+if [ "$METHOD" != "vb" ]; then
+   echo "ERROR Unknown Method"
+   exit 1
+fi
+
+_clean () {
+     VBoxManage --nologo unregistervm $MACHINE
+
+     if [ -f $MACHINEDIR/$MACHINE.xml ]; then
+         rm $MACHINEDIR/$MACHINE.xml
+     fi
+
+     if [ -f $MACHINEDIR/$MACHINE.vbox ]; then
+         rm $MACHINEDIR/$MACHINE.vbox
+     fi
+
+     if [ -d $MACHINEDIR/$MACHINE ]; then
+         rm -Rf $MACHINEDIR/$MACHINE
+     fi
+}
+
+
+export MACHINEDIR=$VBHOME/$MACHINE
+
+if [ -d $VBHOME/$MACHINE ]; then
+  if [ -x $VBHOME/$MACHINE/exec.sh ]; then
+     $VBHOME/$MACHINE/exec.sh  # let the whole thing be defined by the creator of the machine
+			       # environment is: $MACHINE $MACHINEDIR
+  else
+     if [ -x $VBHOME/$MACHINE/init.sh ]; then
+        SCRIPT=$VBHOME/$MACHINE/init.sh
+     elif [ -x $VBHOME/$MACHINE/$MACHINE.vbox.sh ]; then
+        SCRIPT=$VBHOME/$MACHINE/$MACHINE.vbox.sh
+     else
+        SCRIPT=$VLSCRIPTDIR/vb.init.default.sh
+     fi
+
+     VERSION=`cat $SCRIPT | grep '^VERSION' | awk -F= '{print $2}'`
+     if [ "$VERSION" != "$VBSCRIPTVERSION" ]; then
+          echo "ERROR Script has wrong version"
+          exit 1
+     fi
+
+     VP="`ps augx | grep VirtualBox | grep $MACHINE | grep -v grep | head -1 | awk '{print $2}'`"
+
+     if [ ! -z "$VP" ]; then # Vbox machine ist still running. Kill it.
+
+       echo "killing orphaned VirtualBox machine $VP..."
+       kill $VP
+       sleep 1
+       if ps --pid $VP > /dev/null; then sleep 3; fi
+       if ps --pid $VP > /dev/null; then kill -9 $VP; fi
+       _clean
+     else
+       _clean
+
+       #if [ "`ps augx | grep /usr/bin/X11/startx | grep -v grep | head -1`" = "" ]; then
+       #  echo "ERROR X not running"
+       #  exit 1
+       #fi
+
+       echo "Starting Virtual Machine vb/$MACHINE"
+
+       # find $MACHINEDIR -maxdepth 1 -mindepth 1 -type d -exec rm -Rvf {} \;
+       #  ( export MACHINEDIR; export MACHINE ; $SCRIPT )
+       $SCRIPT >>/tmp/vlstartvbmachine.log 2>&1
+       #  (
+       VBoxManage --nologo startvm $MACHINE >>/tmp/vlstartvbmachine.log 2>&1
+ 	  # does not wait!!
+
+       #  echo "Started."
+       sleep 1
+     fi
+   fi
+else
+   echo "ERROR Directory $VBHOME/$1 does not exist"
+   exit 1
+fi

@@ -1,0 +1,12 @@
+Source: iedu-server
+Section: admin
+Priority: optional
+Maintainer: Rene Hadler <rene.hadler@iteas.at>
+Build-Depends: debhelper (>= 8.0.0)
+
+Package: iedu-server
+Architecture: all
+Depends: bash, openssh-server, python3-paramiko, iedu-common (>= 3.3-4), python3-pyqt5, python3-netaddr
+Provides: iedu-server
+Description: Installation of
+ specific files for the installation of i-EDU Server.

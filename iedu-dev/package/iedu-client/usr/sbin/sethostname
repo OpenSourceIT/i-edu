@@ -1,0 +1,20 @@
+#!/bin/bash
+#
+# Set host name
+#
+# Copyright © Robert the-M <develop@the-m.at>
+# Distributable under the terms of the GNU GPL.
+#
+
+ECHOIP=/usr/sbin/echoip
+test -x "$ECHOIP" || exit 0
+
+HN=vlab.`$ECHOIP`
+
+if [ "`hostname`" != "$HN" ]; then
+	echo $HN > /etc/hostname
+	hostname $HN
+	mv /etc/hosts /etc/hosts.orig
+	echo "127.0.0.1	   localhost  $HN" > /etc/hosts
+fi
+

@@ -1,0 +1,14 @@
+Source: iedu-client
+Section: admin
+Priority: optional
+Maintainer: Rene Hadler <rene.hadler@iteas.at>
+Build-Depends: debhelper (>= 8.0.0)
+
+Package: iedu-client
+Architecture: all
+Depends: bash (>= 2.05a-11), coreutils (>= 5.0-5), man-db (>=2.0.0), tar (>= 1.1), gzip (>= 1.3), dialog (>= 1.1), udpcast (>= 20040531), psmisc (>= 22.1), openssh-server (>= 1:2), screen (>= 4.0), x11vnc (>=0.9.3), openssh-client (>= 1:4.7), sudo (>= 1.6), xtightvncviewer (>=1.2.9), udisks (>= 1.0.2) | udisks2, consolekit (>= 0.4), policykit-1 (>= 0.95), ntfs-3g (>= 1:2010.3.6-1), xfce4-terminal, python3-pyqt5, espeak, mbrola, mbrola-de4, mbrola-de5, mbrola-de6, mbrola-de7, lightdm, at, udevil, cdrdao
+Conflicts: them-firewall, vlizedlab-client
+Replaces: vlizedlab-client
+Provides: iedu-client
+Description: Installation of
+ specific files for the installation of i-EDU Client.

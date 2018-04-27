@@ -1,0 +1,8 @@
+[Unit]
+After=systemd-user-sessions.service
+[Service]
+ExecStart=/sbin/agetty -a root -l /etc/startmenu1.sh -c tty1 38400
+Restart=always
+[Install]
+WantedBy=multi-user.target
+

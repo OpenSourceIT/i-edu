@@ -1,0 +1,61 @@
+#!/bin/bash
+
+VLCOMMON=/usr/share/vlizedlab/scripts/common
+if [ -f $VLCOMMON ]; then source $VLCOMMON ; else exit 1; fi
+
+if [ "$1" = "-echo"  ]; then
+   ONLYECHO=yes
+   shift
+else
+   ONLYECHO=no
+fi
+
+#MENU="0 _A_L_L_"
+MENU="0 _none_"
+NR=1
+for XC in \
+   `find $VBHOME -maxdepth 2 -a -type f -a \( -name '*.sh' -o -name '*.vdi' \) -exec dirname {} \; \
+    | sort -u ` ;
+        do
+   MNAME=`basename $XC`
+   MDIR=`dirname $XC`
+   MTOOL=`basename $MDIR`
+   MENU="$MENU $NR $MTOOL/$MNAME"
+#	   MENU="$MENU $NR $MNAME"
+   NR=`expr $NR + 1`
+done
+
+choice=`dialog --cr-wrap \
+                  --backtitle "$VLTITLE" \
+	          --menu 'Which Virtual Machine do you want to delete?' 0 0 0 $MENU 3>&1 1>&2 2>&3`
+
+clear >&2
+
+case $choice in 
+   0)
+     echo "Not deleting any virtual machine." >&2
+     sleep 1
+     ;;
+   [1-9]|[0-9][0-9])
+     VM="" 
+     NR=1
+for XC in \
+   `find $VBHOME -maxdepth 2 -a -type f -a \( -name '*.sh' -o -name '*.vdi' \) -exec dirname {} \; \
+    | sort -u ` ;
+        do
+       if [ "$NR" = "$choice" ]; then
+       XD=$XC
+       fi
+       NR=`expr $NR + 1`
+     done
+     
+     if [ $ONLYECHO = yes ]; then
+          echo $XD
+     else 
+          rm -Rvf $XD
+          echo "waiting..." >&2
+           sleep 1
+     fi
+     ;;
+esac
+

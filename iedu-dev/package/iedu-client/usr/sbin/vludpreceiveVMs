@@ -1,0 +1,52 @@
+#!/bin/bash
+
+echo "Receiving updated virtual machines"
+
+cd /vm
+udp-receiver --nosync --nokbd | tar -xv
+
+if [ $? != 0 ]; then
+   echo "udpcast transmission failed"
+   exit 17
+fi
+
+echo "udpcast transmission finished"
+echo "you received:"
+cat /vm/udpcastlist # contains /vm/v*/MACHINE/* file list.
+
+echo "deleting needless files and correcting permissions"
+if [ -f /vm/udpcastlist ]; then
+
+  for VMACHINE in `cat /vm/udpcastlist | awk -F / '{printf "%s/%s\n",$1,$2}' | sort -u`; do
+
+#     for ff in `find /space/vms/$MACHINE -type f -print | diff - /space/udpcastlist | grep '<' | grep $MACHINE | sed '1,$ s/< //'`
+#     do
+#	#echo "must delete $ff"
+#	rm -v "$ff"
+#     done 
+
+     ( cd /vm ; find $VMACHINE -type f -print | diff - /vm/udpcastlist | grep '<' | grep $VMACHINE | \
+           sed '1,$ s/< //' | awk '/_local/ {next} {printf "rm -v \"%s\" \n",$0}' ) | bash
+
+      MACHINE=/vm/$VMACHINE
+      echo "changing permissions."
+        chown -Rvf student.student $MACHINE
+        find $MACHINE -type d -exec chmod -v 755 {} \;
+        find $MACHINE -type f -name '*.sh' -exec chmod -v 755 {} \;
+        find $MACHINE -type f \! -name '*.sh' -exec chmod -v 644 {} \;
+
+      echo "Update of virtual machine $MACHINE finished."
+
+  done
+  echo "udp receive machines finished."
+  sleep 2
+
+else
+
+  echo "error: no udpcastlist found"
+fi
+
+echo "Executing puppet if present"
+if [ -f "/opt/puppetlabs/bin/puppet" ]; then
+  /opt/puppetlabs/bin/puppet agent --test
+fi

@@ -1,0 +1,72 @@
+#!/bin/bash
+# helper for beeing used in screen
+
+VLCOMMON=/usr/share/vlizedlab/scripts/common
+if [ -f $VLCOMMON ]; then source $VLCOMMON ; else exit 1; fi
+
+if [ "$1" = "root" ]; then
+  echo "$VLTITLE"
+  echo "  You are now inside GNU Screen"
+  echo ""
+  echo '  Visit other tabs with <f7> and <f8>'
+  echo '  Finish this tab with <return>'
+  echo '  Finish all tabs with <ctrl>+A and "\"'
+  read IN
+
+elif [ "$1" = try ]; then
+  echo "This is `hostname` doing $1"
+  echo " TTTTRRRRRYYYYY"
+  echo "  Type <return> to finish this tab"
+  echo '  Visit other tabs with <f7> and <f8>, finish all with <ctrl>+A and "\"'
+  read IN
+
+elif [ "$1" = update ]; then
+  echo "This is `hostname` doing $1"
+  $VLSCRIPTDIR/remotehelper update
+  echo "This was `hostname` doing $1"
+  echo "  Type <return> to finish this tab"
+  echo '  Visit other tabs with <f7> and <f8>, finish all with <ctrl>+A and "\"'
+  read IN
+
+elif [ "$1" = reconfigure ]; then
+  echo "This is `hostname` doing $1"
+  $VLSCRIPTDIR/remotehelper reconfigure
+  echo "This was `hostname` doing $1"
+  echo "  Type <return> to finish this tab"
+  echo '  Visit other tabs with <f7> and <f8>, finish all with <ctrl>+A and "\"'
+  read IN
+
+elif [ "$1" = deletevm ]; then
+  echo "This is `hostname` doing $1 $2"
+  $VLSCRIPTDIR/remotehelper deletevm $2
+  echo "This was `hostname` doing $1 $2"
+  echo "  Type <return> to finish this tab"
+  echo '  Visit other tabs with <f7> and <f8>, finish all with <ctrl>+A and "\"'
+  read IN
+
+elif [ "$1" = receivevm ]; then
+  echo "This is `hostname` doing $1"
+  $VLSCRIPTDIR/remotehelper receivevm
+  echo "This was `hostname` doing $1"
+  echo "  Type <return> to finish this tab"
+  echo '  Visit other tabs with <f7> and <f8>, finish all with <ctrl>+A and "\"'
+  read IN
+
+elif [ "$1" = sendvm ]; then
+  echo "This is `hostname` doing sendvm"
+  shift
+  vludpsendVMs $*
+  echo "This was `hostname` doing sendvm"
+  echo "  Type <return> to finish this tab"
+  echo '  Visit other tabs with <f7> and <f8>, finish all with <ctrl>+A and "\"'
+  read IN
+
+# elif [ "$1" = menu ]; then
+#  echo "This is `hostname` doing $1"
+#  export TERM=screen
+#  $VLSCRIPTDIR/startmenumaint
+#  echo "This was `hostname` doing $1"
+
+fi
+
+

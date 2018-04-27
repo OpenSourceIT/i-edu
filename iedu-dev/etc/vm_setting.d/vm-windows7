@@ -1,0 +1,4 @@
+network=bridged
+macaddr=
+bridgeadapter=
+usbmode=usb

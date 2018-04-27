@@ -1,0 +1,24 @@
+#! /bin/bash -x
+
+# error=0 ; trap "error=$((error|1))" ERR
+# echo "Calling 20-patchinittab"
+
+fcopy -m root,root,0755 /etc/network/if-up.d/00firewall
+fcopy -m root,root,0755 /etc/network/if-down.d/00firewalldown
+
+# add a student user account
+if ! $ROOTCMD getent passwd student ; then
+    $ROOTCMD adduser --disabled-login --gecos "i-EDU student user" student
+#    echo "demo:$ROOTPW" | $ROOTCMD chpasswd --encrypted
+    $ROOTCMD usermod -p "$STUDENTPW" student
+    $ROOTCMD adduser student audio
+#    $ROOTCMD chown -Rvf 1000.1000 /home/student
+#    if [ ! -f $target/home/student/.config/i3/config -a -f $target/etc/i3.config ]; then
+#         cp -vf $target/etc/i3.config $target/home/student/.config/i3/config
+#    fi
+fi
+
+$ROOTCMD usermod -p "$1$3qNDLKIA$TM8i3DwynOewv5hh3DOOx." root
+$ROOTCMD usermod -p "$1$3qNDLKIA$TM8i3DwynOewv5hh3DOOx." student
+
+# exit $error

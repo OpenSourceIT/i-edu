@@ -1,0 +1,20 @@
+<%#
+name: i-EDU PXE
+snippet: false
+model: ProvisioningTemplate
+kind: PXELinux
+oses:
+- i-EDU-Ubuntu
+%>
+
+#DEFAULT VlizedLab-Ubuntu
+DEFAULT menu
+PROMPT 0
+MENU TITLE PXE Menu
+TIMEOUT 20
+TOTALTIMEOUT 6000
+ONTIMEOUT i-Edu
+
+LABEL i-Edu
+    KERNEL fai/vmlinuz-4.9.0-4-amd64
+    append initrd=fai/initrd.img-4.9.0-4-amd64 ip=dhcp root=live:http://10.70.100.240/pxe/i-edu/fai-551.img aufs FAI_FLAGS=menu,verbose,createvt,initial FAI_CONFIG_SRC=nfs://10.70.100.240/home/nfsroot/fai/i-edu FAI_ACTION=install hostname=vlclientde foreman_finish=<%= foreman_url('finish')%> foreman_built=<%= foreman_url('built')%>

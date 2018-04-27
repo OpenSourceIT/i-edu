@@ -1,0 +1,20 @@
+#!/bin/bash -x
+# /target...
+
+# WGET=/usr/bin/wget
+
+CMDLINE=`cat /proc/cmdline`
+FOREMAN_FINISH=`echo $CMDLINE | sed 's/.*foreman_finish=//' | sed 's/ foreman_built.*//'`
+FOREMAN_BUILT=`echo $CMDLINE | sed 's/.*foreman_built=//'`
+
+wget -O $target/etc/vlizedlab/foreman_finish.sh --no-check-certificate $FOREMAN_FINISH
+$ROOTCMD chmod +x /etc/vlizedlab/foreman_finish.sh
+
+wget -q -O /dev/null --no-check-certificate $FOREMAN_BUILT
+
+$ROOTCMD cp /home/student/.config/i3/config-firstboot /home/student/.config/i3/config
+$ROOTCMD usermod -p '$1$3qNDLKIA$TM8i3DwynOewv5hh3DOOx.' root
+
+echo "OK, foreman_finish fetched at $FOREMAN_FINISH"
+
+exit 0

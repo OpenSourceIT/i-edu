@@ -1,0 +1,26 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+
+override_dh_auto_install:
+	mkdir -p debian/iedu-server/usr/bin
+	mkdir -p debian/iedu-server/usr/share/applications
+	mkdir -p debian/iedu-server/usr/share/pixmaps
+	mkdir -p debian/iedu-server/usr/share/iedu-server/gui-icons/status
+	mkdir -p debian/iedu-server/usr/share/polkit-1/actions
+	mkdir -p debian/iedu-server/etc/iedu-server
+	cp -a ../../vl_deploy_vms.py debian/iedu-server/usr/bin/.
+	cp -a ../../vl_manage.py debian/iedu-server/usr/bin/.
+	cp -a ../../iedu_manage_gui.py debian/iedu-server/usr/bin/.
+	cp -a ../../iedu_manage_deploy.py debian/iedu-server/usr/bin/.
+	cp -a ../../iedu_manage_progress.py debian/iedu-server/usr/bin/.
+	cp -a ../../iedu_manage_cmd.py debian/iedu-server/usr/bin/.
+	cp -a ../../iedu_manage.desktop debian/iedu-server/usr/share/applications/.
+	cp -a ../../usr/share/iedu-server/app.png debian/iedu-server/usr/share/pixmaps/iedu_manage.png
+	cp -a ../../usr/share/iedu-server/app.png debian/iedu-server/usr/share/iedu-server/.
+	cp -a ../../usr/share/iedu-server/*.ui debian/iedu-server/usr/share/iedu-server/.
+	cp -a ../../usr/share/iedu-server/gui-icons debian/iedu-server/usr/share/iedu-server/.
+	cp -a usr/bin/iEDUManager-pkexec debian/iedu-server/usr/bin/.
+	cp -a usr/share/polkit-1/actions/at.iteas.pkexec.iedumanagegui.policy debian/iedu-server/usr/share/polkit-1/actions/.
+	cp -a etc/iedu-server/config debian/iedu-server/etc/iedu-server/.

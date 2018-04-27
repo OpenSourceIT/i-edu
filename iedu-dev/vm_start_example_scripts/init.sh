@@ -1,0 +1,94 @@
+#!/bin/bash -x
+
+VERSION=2
+
+echo "starting MACHINE >$MACHINE< in >$MACHINEDIR<"
+
+VBoxManage --nologo createvm --name $MACHINE --register --basefolder $MACHINEDIR
+
+# Uncomment to force write mode
+#INITVM=1
+
+# VBoxManage --nologo modifyvm $MACHINE         --ostype linux26
+VBoxManage --nologo modifyvm $MACHINE --ostype windows7_64 \
+        --memory 4096 \
+        --vram 256 \
+        --cpus 4 \
+        --acpi on \
+        --ioapic on \
+        --hwvirtex on \
+        --bioslogofadein off \
+        --bioslogofadeout off \
+        --bioslogodisplaytime 1 \
+        --audio alsa \
+        --nictype1 "82540EM" \
+        --audiocontroller hda
+
+# Bridge Modus
+#  --nic1 bridged \
+#  --bridgeadapter1 enp1s0 \
+# NAT Modus
+#  --nic1 nat
+# USB Modus
+#  --usb on \
+#  --usbehci on
+# Video Modus
+#  --accelerate2dvideo on \
+#  --accelerate3d on \
+
+# Turn this off by default:
+# VBoxManage --nologo modifyvm $MACHINE         --accelerate3d on
+
+#Start Virtal Machine in Fullscreen
+#VBoxManage --nologo setextradata $MACHINE GUI/Fullscreen on
+
+
+
+#Enable seemless mode
+#VBoxManage setextradata $MACHINE GUI/Seamless on
+
+#Hide Manubar and Statusbar
+VBoxManage --nologo setextradata global GUI/Customizations noMenuBar,noStatusBar
+VBoxManage --nologo setextradata $MACHINE GUI/Customizations noMenuBar,noStatusBar
+# VBoxManage --nologo setextradata $MACHINE GUI/Customizations noStatusBar
+
+#Hide MiniToolBar
+VBoxManage --nologo setextradata $MACHINE GUI/ShowMiniToolBar no
+
+#Set Alignment of MiniToolaBar
+#VBoxManage --nologo setextradata $MACHINE GUI/MiniToolBarAlignment bottom
+
+#Only allow Powerdown on "HOSTKEY+Q"
+#VBoxManage --nologo setextradata $MACHINE GUI/RestrictedCloseActions SaveState,Shutdown,Restore
+VBoxManage --nologo setextradata $MACHINE GUI/RestrictedCloseActions SaveState,Restore
+
+if [ -f $MACHINEDIR/init.add.sh ]; then
+    source $MACHINEDIR/init.add.sh
+fi
+# Set USB-Filter if any set
+if [ -f /usr/bin/vl_vm_action.py ]; then
+    /usr/bin/vl_vm_action.py usb $MACHINE
+    /usr/bin/vl_vm_action.py config $MACHINE
+fi
+
+VBoxManage --nologo sharedfolder add $MACHINE  --name media --hostpath /media --automount
+
+VBoxManage --nologo storagectl    $MACHINE --name C$MACHINE --add sata --controller IntelAHCI --hostiocache on
+if [ $INITVM == 1 ]; then
+VBoxManage --nologo storageattach $MACHINE --storagectl C$MACHINE --port 0 --device 0 \
+      --type hdd --medium $MACHINEDIR/$MACHINE.vdi --mtype normal
+else
+VBoxManage --nologo storageattach $MACHINE --storagectl C$MACHINE --port 0 --device 0 \
+      --type hdd --medium $MACHINEDIR/$MACHINE.vdi --mtype immutable
+fi
+
+# Add empty dvd-drive
+VBoxManage --nologo storageattach $MACHINE --storagectl C$MACHINE --port 1 --device 0 --type dvddrive --medium emptydrive
+#vboxmanage --nologo storagectl $MACHINE --name I$MACHINE --add ide --controller PIIX4
+#vboxmanage --nologo storageattach $MACHINE --storagectl I$MACHINE --port 0 --device 0 --type dvddrive --medium emptydrive
+
+#      --type hdd --medium $MACHINEDIR/$MACHINE.vdi --mtype immutable
+
+#USB-Filter festlegen zur Durchreichung von USB-Devices, wird jetzt über das Python Script vl_vm_action.py und /etc/vlizedlab/example gesetzt
+#
+#VBoxManage --nologo usbfilter add 0 --target $MACHINE --name "USB-Stick1" --vendorid 0951 --productid 16a2

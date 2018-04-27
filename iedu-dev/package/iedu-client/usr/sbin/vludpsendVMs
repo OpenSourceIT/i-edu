@@ -1,0 +1,97 @@
+#!/bin/bash
+
+echo "Send Virtual Machines"
+
+VLCOMMON=/usr/share/vlizedlab/scripts/common
+if [ -f $VLCOMMON ]; then source $VLCOMMON ; else exit 1; fi
+
+if [ "$1" = "-echo"  ]; then
+   ONLYECHO=yes
+   shift
+else
+   ONLYECHO=no
+fi
+
+_sendvm () { # $* are VMs like /vm/vb/MACHINE
+  if [ $ONLYECHO = yes ]; then
+     echo $*
+  else
+    echo "Sending $*"
+    find $* -maxdepth 1 -type f \( -name '*.iso' -o -name '*.txt' -o -name '*.vdi' -o -name '*.sh' \) -a ! -name '*_local*' -print | sed '1,$ s/\/vm\///g' > /vm/udpcastlist
+    (
+    cd /vm
+#   cat udpcastlist
+    tar -cv udpcastlist `cat udpcastlist` | udp-sender
+    )
+
+# this is dirty, but it also works with filenames with blanks
+#  CMD=`cat /space/udpcastlist | awk 'BEGIN {printf "tar -czv /space/udpcastlist "} {printf "\"%s\" ",$0}'`
+#  ( echo $CMD | bash ) | udp-sender
+
+    echo "Sending $* done."
+  fi
+}
+
+_sendmakechoice () {
+	MENU="0 _A_L_L_"
+	# MENU="0 _none_"
+	NR=1
+	for XC in \
+   `find $VBHOME -maxdepth 2 -a -type f -a \( -name '*.sh' -o -name '*.vdi' \) -exec dirname {} \; \
+    | sort -u ` ;
+        do
+	   MNAME=`basename $XC`
+	   MDIR=`dirname $XC`
+	   MTOOL=`basename $MDIR`
+	   MENU="$MENU $NR $MTOOL/$MNAME"
+#	   MENU="$MENU $NR $MNAME"
+	   NR=`expr $NR + 1`
+	done
+	choice=`dialog --cr-wrap --backtitle "$VLTITLE" \
+	               --menu 'Which Virtual Machine do you want to send?' 0 0 0 $MENU 3>&1 1>&2 2>&3`
+}
+
+_sendvmchoice () { # needs _sendvm
+
+	case $choice in 
+	   0)
+	     echo "Sending all virtual machines"
+	     echo "Careful, this may take hours!"
+	     echo "press <ctrl>-c to stop, any key to proceed"
+	     read IN
+	     sleep 1
+	     _sendvm \
+   `find $VBHOME -maxdepth 2 -a -type f -a \( -name '*.sh' -o -name '*.vdi' \) -exec dirname {} \; \
+    | sort -u `
+	      sleep 1
+	     ;;
+	   [0-9]*)
+	     VM=""
+	     NR=1
+	     for XC in \
+   `find $VBHOME -maxdepth 2 -a -type f -a \( -name '*.sh' -o -name '*.vdi' \) -exec dirname {} \; \
+    | sort -u ` ;
+             do
+	        if [ "$NR" = "$choice" ]; then
+	          VM=$XC
+	        fi
+	        NR=`expr $NR + 1`
+	     done
+	     _sendvm $VM
+	     sleep 1
+	     ;;
+	esac
+   
+}
+
+if [ "$*" != "" ]; then
+        _sendvm $*
+
+else
+	clear >&2
+	_sendmakechoice # writes $choice
+	clear >&2
+	_sendvmchoice $choice # needs $DELAKT
+
+fi
+

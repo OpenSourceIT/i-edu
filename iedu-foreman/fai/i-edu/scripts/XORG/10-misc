@@ -1,0 +1,18 @@
+#! /bin/bash -x
+
+#error=0 ; trap "error=$((error|1))" ERR
+
+#ifclass XORG && {
+#     fcopy -M /etc/X11/xorg.conf
+#    [ -n "$VIDEODRIVER" ] || VIDEODRIVER=vesa
+#    grep -q %%VIDEODRIVER%% $target/etc/X11/xorg.conf &&
+#    perl -pi.orig -pe "s/%%VIDEODRIVER%%/$VIDEODRIVER/" $target/etc/X11/xorg.conf
+#}
+# fcopy -m root,root,0744 /root/.xinitrc
+#exit $error
+
+fcopy -M /etc/i3/config
+
+mkdir -vp $target/etc/skel/.config/i3
+#cp -v $target/etc/i3/config $target/etc/skel/.config/i3/config
+

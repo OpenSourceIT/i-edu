@@ -1,0 +1,4 @@
+ion3		ion3/did-not-acknowledge-outdated              boolean false
+ion3		ion3/acknowledge-outdated                      boolean true
+ion3		ion3/acknowledge-maybe-outdated                boolean true
+

@@ -1,0 +1,75 @@
+#!/bin/bash
+
+VLCOMMON=/usr/share/vlizedlab/scripts/common
+if [ -f $VLCOMMON ]; then source $VLCOMMON ; else exit 1; fi
+
+while [ -f /tmp/maintlock ]; do
+    sleep 1
+    echo -n '.'
+done
+
+################################
+# Adaptions, Bugfixes
+
+source $VLSCRIPTDIR/patches
+
+################################
+
+# while [ -f /tmp/maintlock ]; do
+#     echo -n .
+#     sleep 1
+# done
+
+if [ -f /etc/vlizedlab/postinst.notyet ]; then
+   mv /etc/vlizedlab/postinst.notyet /etc/vlizedlab/postinst
+   /etc/vlizedlab/postinst
+fi
+
+#sethostname
+
+# We dont need the menu
+cd /home/student
+su student -c $VLSCRIPTDIR/startstudent
+exit 0
+
+choice=`dialog --cr-wrap \
+          --backtitle "$VLTITLE"\
+          --nocancel \
+          --default-item s\
+          --timeout 2 \
+          --menu 'Please choose what to do:' 0 0 0 \
+                  s '** start GUI (starts in 2 sec) **' \
+                  r 'reboot' \
+                  p 'power off machine' \
+                  f 'refresh menu' \
+                   3>&1 1>&2 2>&3 `
+
+
+#                  ' ' '' \
+#                  ' ' 'PLEASE: Power off screen by hand, when you leave!' \
+
+clear
+
+case $choice in
+#  s)
+#    cd /home/student
+#    su student -c $VLSCRIPTDIR/startstudent
+#    ;;
+  m) 
+    $VLSCRIPTDIR/startmenumaint
+    ;;
+  r) 
+    reboot
+    ;;
+  p)
+    poweroff
+    ;;
+  f)
+    true
+    ;;
+  *)
+    cd /home/student
+    su student -c $VLSCRIPTDIR/startstudent
+    ;;
+esac
+

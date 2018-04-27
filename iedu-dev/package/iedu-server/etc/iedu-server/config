@@ -1,0 +1,14 @@
+[MAIN]
+
+# Directory which contains the virtualbox VMs
+VM_ROOT =
+
+# IP to check for internet connectivity
+CHECK_INTERNET_IP =
+
+[FOREMAN]
+
+# Foreman login data
+FOREMAN_HOST =
+FOREMAN_USER =
+FOREMAN_PASS =

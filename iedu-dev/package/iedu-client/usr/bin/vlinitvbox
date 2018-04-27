@@ -1,0 +1,35 @@
+#!/bin/bash
+
+echo "Re-Initializing Virtualbox"
+
+VLCOMMON=/usr/share/vlizedlab/scripts/common
+if [ -f $VLCOMMON ]; then source $VLCOMMON ; else exit 1; fi
+
+rm -Rvf $HOME/.VirtualBox
+rm -Rvf $HOME/.config/VirtualBox
+find $VBHOME -name '*.vbox' -exec rm -v {} \;
+
+echo "Base Settings"
+
+# vboxmanage --nologo setproperty vdifolder $VBHOME
+vboxmanage --nologo setproperty machinefolder $VBHOME
+vboxmanage --nologo setproperty vrdeauthlibrary default
+# vboxmanage --nologo setproperty hwvirtexenabled yes
+vboxmanage --nologo setproperty loghistorycount 2
+
+#vboxmanage --nologo setextradata global "GUI/SuppressMessages" \
+#"remindAboutInputCapture,remindAboutAutoCapture,remindAboutMouseIntegrationOn,remindAboutMouseIntegrationOff,confirmInputCapture,confirmGoingFullscreen,remindAboutWrongColorDepth"
+
+vboxmanage --nologo setextradata global "GUI/SuppressMessages" "all"
+
+# remindAboutGoingSeamless,
+
+vboxmanage --nologo setextradata global "GUI/Customizations" "noMenuBar,noStatusBar"
+
+vboxmanage --nologo list systemproperties
+
+#for ff in `find /space/vbox -name '*.vbox.sh' -print` ; do
+#   echo "Registering Machine `dirname $ff`"
+#   source $ff
+#done
+

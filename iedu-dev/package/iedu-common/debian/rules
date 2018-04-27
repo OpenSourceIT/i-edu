@@ -1,0 +1,8 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+
+override_dh_auto_install:
+	mkdir -p debian/iedu-common/usr/lib/python3/dist-packages/iedu
+	cp -a ../../usr/lib/python3/dist-packages/iedu/*.py debian/iedu-common/usr/lib/python3/dist-packages/iedu/.

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+fcopy -m root,root,0744 /etc/installonfirstboot.sh
+fcopy -m root,root,0744 /etc/autoload_vms.sh
+
+# fcopy -M /usr/src/virtualbox.deb
+# fcopy -M /usr/src/virtualbox-dkms.deb
+# fcopy -M /usr/src/virtualbox-qt.deb
+
+

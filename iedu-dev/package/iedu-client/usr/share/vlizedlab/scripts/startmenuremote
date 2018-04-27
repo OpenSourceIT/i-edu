@@ -1,0 +1,248 @@
+#!/bin/bash
+
+VLCOMMON=/usr/share/vlizedlab/scripts/common
+if [ -f $VLCOMMON ]; then source $VLCOMMON ; else exit 1; fi
+
+SCREENFILE=/tmp/screenrc
+
+#VERSION=exp17
+#IP=1.2.3.4
+
+_doatIPs () {
+
+   for ip in $IPLIST ; do
+# assumes pinging is already tryed when gathering the IPs in choose*ip
+#	if ping -c 1 -W 1 $ip > /dev/null ; then echo 
+	      ssh -f root@$ip $1
+#	else 
+#	      echo $ip does not ping ; 
+#	fi
+   done
+
+}
+
+_doatIPsScreen () {
+
+   if [ -f $SCREENFILE ]; then
+     rm $SCREENFILE
+   fi
+
+   if [ "$1" = "-local" ]; then
+     LOCALACTION="$2"
+     shift
+     shift
+   else
+     LOCALACTION=""
+   fi
+
+   touch $SCREENFILE
+   chmod 600 $SCREENFILE
+
+   echo "# temporary screenrc for theMs vm system" > $SCREENFILE
+   echo "startup_message off" >> $SCREENFILE
+   echo "bind - resize -2" >> $SCREENFILE
+   echo "bind + resize +2" >> $SCREENFILE
+   echo "bindkey -k k7 prev" >> $SCREENFILE
+   echo "bindkey -k k8 next" >> $SCREENFILE
+   echo "hardstatus alwayslastline" >> $SCREENFILE
+   echo "hardstatus string '%{= kg}[%{G}%H%{g}][%= %{= kw}%?%-Lw%?%{=b kR}(%{W}%n*%f %t%?(%u)%?%{=b kR})%{= kw}%?%+Lw%?%?%= %{g}]%{=b C}[%c:%s]%{W}'" >> $SCREENFILE
+
+   echo "screen -t root 0 $VLSCRIPTDIR/screenhelper root" >> $SCREENFILE
+
+   NR=1
+   for ip in $IPLIST ; do
+
+# assumes pinging is already tryed when gathering the IPs in choose*ip
+#	if ping -c 1 -W 1 $ip > /dev/null ; then echo 
+	      NM=`echo $ip | awk -F. '{print $4}'`
+	      echo "screen -t $NM $NR ssh root@$ip $1" >> $SCREENFILE
+	      NR=`expr $NR + 1`
+#	else 
+#		echo $ip does not ping ; 
+#	fi
+
+   done
+
+   if [ "$LOCALACTION" != "" ]; then
+       echo "screen -t local $NR $LOCALACTION" >> $SCREENFILE
+   fi
+
+   screen -c $SCREENFILE
+
+   if [ -f $SCREENFILE ]; then
+     rm $SCREENFILE
+   fi
+   
+}
+
+_delremotevm () {
+     IPLIST="`$VLSCRIPTDIR/chooseips`"
+    _doatIPsScreen "$VLSCRIPTDIR/screenhelper deletevm $*"
+}
+
+#_startreceiver() {
+#    IPLIST="`$VLSCRIPTDIR/chooseips`"
+#    _doatIPs "$VLSCRIPTDIR/remotehelper receivevm"
+#    sleep 2
+#}
+
+_sendvmtoremote () {
+     IPLIST="`$VLSCRIPTDIR/chooseips`"
+     _doatIPsScreen -local "$VLSCRIPTDIR/screenhelper sendvm $*" "$VLSCRIPTDIR/screenhelper receivevm"
+}
+
+_choosevm () {
+  ENU="0 _none_"
+  NR=1
+  for XC in \
+   `find $VBHOME -maxdepth 2 -a -type f -a \( -name '*.sh' -o -name '*.vdi' \) -exec dirname {} \; \
+    | sort -u ` ;
+        do
+     MNAME=`basename $XC`
+     MDIR=`dirname $XC`
+     MTOOL=`basename $MDIR`
+     MENU="$MENU $NR $MTOOL/$MNAME"
+#	   MENU="$MENU $NR $MNAME"
+     NR=`expr $NR + 1`
+  done
+
+  choice=`dialog --cr-wrap \
+                  --backtitle "$VLTITLE" \
+	          --menu 'Which Virtual Machine do you want to start?' 0 0 0 $MENU 3>&1 1>&2 2>&3`
+
+  clear >&2
+
+  case $choice in 
+   0)
+     echo "Not starting any virtual machine." >&2
+     sleep 1
+     ;;
+   [1-9]|[0-9][0-9])
+     VM="" 
+     NR=1
+     for XC in \
+   `find $VBHOME -maxdepth 2 -a -type f -a \( -name '*.sh' -o -name '*.vdi' \) -exec dirname {} \; \
+    | sort -u ` ;
+        do
+       if [ "$NR" = "$choice" ]; then
+       XD=$XC
+       MNAME=`basename $XD`
+       MDIR=`dirname $XD`
+       MTOOL=`basename $MDIR`
+       fi
+       NR=`expr $NR + 1`
+     done
+     echo $MTOOL/$MNAME
+     ;;
+esac
+
+}
+
+
+ALLSTUDENTIPLIST=""
+for ff in `grep -v '#' $MYSTUDENTLIST`; do
+   ALLSTUDENTIPLIST="$ALLSTUDENTIPLIST $ff"
+done
+if [ "$ALLSTUDENTIPLIST" = "" ]; then
+    echo "No machines configured for remote maintenance" >&2
+    exit 1
+fi
+
+choice=0
+
+while [ "$choice" != "x" ]; do
+
+	choice=`dialog --cr-wrap \
+                  --backtitle "$VLTITLE"\
+	          --nocancel \
+	          --menu 'REMOTE Maintenance - Please choose:' 0 0 0 \
+                          c 'clear this screen' \
+                          e 'echo' \
+	                  d 'delete VMs on remote machines' \
+                          sv 'send VMs to remote machines' \
+                          st 'start VMs at remote machines' \
+	                  a 'update configuration at remote machines' \
+                          u 'update vlizedlab scripts at remote machines' \
+                          b 'reboot remote machines' \
+                          s 'shut down remote machines' \
+	                  x '... back to maintenance menu' \
+	                   3>&1 1>&2 2>&3 `
+
+
+#                          r 'reset remote machines' \
+#                          i 'individual maintenance on remote machines' \
+
+	clear
+
+	case $choice in
+          c)
+	    clear
+            ;;
+	  e)
+	    IPLIST="`$VLSCRIPTDIR/chooseips`"
+	    clear
+	    _doatIPs "$VLSCRIPTDIR/remotehelper echo"
+	    sleep 3
+	    ;;
+          d)
+                DELM=`vldeletevms -echo`
+		if [ -d "$DELM" ] ; then
+	    	clear
+                _delremotevm $DELM
+		fi
+
+            ;;
+	  sv)
+                SENDMS=`vludpsendVMs -echo`
+	    	clear
+                _sendvmtoremote $SENDMS
+	    ;;
+	  sc)
+	    IPLIST="`$VLSCRIPTDIR/chooseips`"
+            _doatIPsScreen "$VLSCRIPTDIR/screenhelper try"
+            ;;
+	  st)
+	    SVM=`_choosevm`
+	    IPLIST="`$VLSCRIPTDIR/chooseips`"
+	    clear
+	    if [ -d /vm/$SVM ]; then
+	      _doatIPs "$VLSCRIPTDIR/remotehelper startvm $SVM"
+	      sleep 10
+	    fi
+	    ;;
+	  a)
+	    IPLIST="`$VLSCRIPTDIR/chooseips`"
+	    _doatIPsScreen "$VLSCRIPTDIR/screenhelper reconfigure"
+	    sleep 1
+	    ;;
+	  u) 
+	    IPLIST="`$VLSCRIPTDIR/chooseips`"
+	    _doatIPsScreen "$VLSCRIPTDIR/screenhelper update"
+	    sleep 1
+	    ;;
+#	  r)
+#	    IPLIST="`$VLSCRIPTDIR/chooseips`"
+#	    _doatIPs "$VLSCRIPTDIR/remotehelper reset"
+#	    sleep 1
+#	    ;;
+	  b)
+	    IPLIST="`$VLSCRIPTDIR/chooseips`"
+	    _doatIPs "reboot"
+	    sleep 1
+	    ;;
+	  s)
+	    IPLIST="`$VLSCRIPTDIR/chooseips`"
+	    _doatIPs "poweroff"
+	    sleep 1
+	    ;;
+	  i)
+	    IPLIST="`$VLSCRIPTDIR/chooseips`"
+	    _doatIPsScreen "$VLSCRIPTDIR/screenhelper menu"
+	    sleep 1
+	    ;;
+	  x)
+	    true
+	    ;;
+	esac
+
+done

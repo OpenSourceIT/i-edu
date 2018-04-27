@@ -1,0 +1,30 @@
+#!/bin/bash
+
+PATH=/usr/sbin:/sbin:/bin:/usr/bin
+
+#
+# delete all existing rules.
+#
+iptables -F
+iptables -t nat -F
+iptables -t mangle -F
+iptables -X
+
+# Strictly no IPV6
+ip6tables -F
+ip6tables -t nat -F
+ip6tables -t mangle -F
+ip6tables -X
+ip6tables -P INPUT DROP
+ip6tables -P OUTPUT DROP
+ip6tables -P FORWARD DROP
+ip6tables -I INPUT -j DROP
+ip6tables -P INPUT DROP
+ip6tables -I OUTPUT -j DROP
+ip6tables -P OUTPUT DROP
+ip6tables -I FORWARD -j DROP
+ip6tables -P FORWARD DROP
+
+# Disable routing.
+echo 0 > /proc/sys/net/ipv4/ip_forward
+

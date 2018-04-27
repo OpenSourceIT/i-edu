@@ -1,0 +1,7 @@
+# In diesem Verzeichnis können einzelne Dateien mit Startmenüeinträgen abgelegt werden
+#
+# Statisches Element für Startmenü, Format:
+# programmname,befehl,icon
+# zb. Texteditor,gedit,/usr/share/icons/Humanity/apps/48/gedit-logo.svg
+# wenn icon "default" ist wird ein Standard Icon genommen
+Texteditor2,gedit,/usr/share/icons/Humanity/apps/48/gedit-logo.svg,9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08

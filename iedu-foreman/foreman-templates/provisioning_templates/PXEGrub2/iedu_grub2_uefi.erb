@@ -1,0 +1,16 @@
+<%#
+name: i-EDU Grub2 UEFI
+snippet: false
+model: ProvisioningTemplate
+kind: PXEGrub2
+oses:
+- i-EDU-Ubuntu
+%>
+
+set default=0
+set timeout=4
+
+menuentry 'i-EDU 4.9.0-4' {
+  linuxefi fai/vmlinuz-4.9.0-4-amd64 ip=dhcp root=live:http://10.70.100.240/pxe/i-edu/fai-551.img aufs FAI_FLAGS=menu,verbose,createvt,initial FAI_CONFIG_SRC=nfs://10.70.100.240/home/nfsroot/fai/i-edu FAI_ACTION=install hostname=vlclientdeuefi foreman_finish=<%= foreman_url('finish')%> foreman_built=<%= foreman_url('built')%>
+  initrdefi fai/initrd.img-4.9.0-4-amd64
+}

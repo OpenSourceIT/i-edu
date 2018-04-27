@@ -1,0 +1,18 @@
+#! /bin/bash
+
+# assign classes hosts
+
+# use a list of classes for our demo machine
+case $HOSTNAME in
+	vlclientdeuefi)
+    echo "FAIBASE UBUNTU_1604_LTS XORG VIRTUALBOX SOUND VLIZEDLAB GERMAN UEFI" ;;
+    vlclientde)
+	echo "FAIBASE UBUNTU_1604_LTS XORG VIRTUALBOX SOUND VLIZEDLAB GERMAN" ;;
+    vlclient)
+	echo "FAIBASE UBUNTU_1604_LTS XORG VIRTUALBOX SOUND VLIZEDLAB" ;;
+    *)
+	echo "FAIBASE UBUNTU_1604_LTS" ;;
+esac
+
+(ifclass I386 || ifclass AMD64) && echo GRUB_PC
+exit 0

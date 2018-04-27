@@ -1,0 +1,58 @@
+#!/bin/bash
+
+VLCOMMON=/usr/share/vlizedlab/scripts/common
+if [ -f $VLCOMMON ]; then source $VLCOMMON ; else exit 1; fi
+
+TMPLIST=/tmp/vmlist$$
+
+_updatevm () { # $1 is "METHOD,HNAME,URL,TYP/MNAME: FILES"
+    METHOD="`echo $1 | awk -F, '{print $1}'`"
+    URL="`echo $1 | awk -F, '{print $3}'`"
+    TYP="`echo $1 |    awk -F, '{print $4}' | awk -F/ '{print $1}'`"
+    MNAME="`echo $1 |  awk -F, '{print $4}' | awk -F/ '{print $2}' | awk -F: '{print $1}' `"
+    FILELISTRAW="`echo $1 |  awk -F, '{print $4}' | awk -F/ '{print $2}' | awk -F: '{print $2}'`"
+#    FILELIST="`echo "$FILELISTRAW" | sed '1,$ s/%[-a-zA-Z0-9_\.@]*//g'`"
+#    FILTERSTRING="`echo "$FILELISTRAW" | sed '1,$ s/[ \t][ \t]*/|/g' | sed '1,$ s/^|//' | sed '1,$ s/|$//' | sed '1,$ s/%//g'`"
+    FILELIST="`echo "$FILELISTRAW" | sed '1,$ s/[-a-zA-Z0-9_\.]*_local[-a-zA-Z0-9_\.@]*//g'`"
+    FILTERSTRING="`echo "$FILELISTRAW" | sed '1,$ s/[ \t][ \t]*/|/g' | sed '1,$ s/^|//' | sed '1,$ s/|$//'`|[-a-zA-Z0-9_\.]*_local[-a-zA-Z0-9_\.@]*"
+
+
+    if [ "$TYP" = vb ]; then
+       for file in $FILELIST ; do
+          if [ $METHOD = http ]; then
+              mkdir -p $VBHOME/$MNAME
+              wget $WGETOPTS -O $VBHOME/$MNAME/$file "$URL/$MNAME/$file"
+              if [ $? != 0 ]; then
+                echo "ERROR downloading $URL/$MNAME/$file"
+                if [ -f $VBHOME/$MNAME/$file ]; then rm -f $VBHOME/$MNAME/$file; fi
+              fi
+          elif [ $METHOD = rsync ]; then
+              mkdir -p $VBHOME/$MNAME
+              rsync $RSYNCOPTS $URL/$MNAME/$file $VBHOME/$MNAME/$file
+              if [ $? != 0 ]; then
+                echo "ERROR downloading $URL/$MNAME/$file"
+                if [ -f $VBHOME/$MNAME/$file ]; then rm -f $VBHOME/$MNAME/$file; fi
+              fi
+          else
+            echo "ERROR: unknown method $METHOD"
+          fi
+       done
+       for dd in `/bin/ls $VBHOME/$MNAME | egrep -v "$FILTERSTRING"` ; do
+            rm -Rvf $VBHOME/$MNAME/$dd
+       done
+       chown -Rvf student.student $VBHOME/$MNAME
+       find $VBHOME/$MNAME -name '*.sh' -exec chmod -v 755 {} \;
+    else
+       echo "ERROR: unknown type $TYP"
+    fi
+
+#        echo "Updating  Virtual Machines $VBOXRSYNCHOST::vbox/$1"
+# -c --size-only
+#        rsync -vrptlO -z --progress --delete  -f '- *~' $VBOXRSYNCHOST::vbox/$1  $VMHOME
+#        chown -Rvf student.users $VMHOME/$1
+#        chmod -Rvf 775 $VMHOME/$1
+#        echo "Update of Virtual Machines $VBOXRSYNCHOST::vbox/$1 done."
+}
+
+#_updatevm "http,hspts-virtualbox,http://10.70.100.251/machines,vb/kubuntu-test: kubuntu-test.vdi init.sh"
+

@@ -1,0 +1,54 @@
+#!/bin/bash -x
+# /target...
+
+# WGET=/usr/bin/wget
+
+mkdir -p $target/etc/vlizedlab/rootkey
+
+ROOTHOSTLIST="10.70.100.251 192.168.0.1 192.168.1.1 192.168.2.1 192.168.3.1 192.168.4.1 192.168.5.1 192.168.6.1 192.168.7.1 192.168.8.1 192.168.9.1 root.vlizedlab.at"
+
+for host in $ROOTHOSTLIST ; do
+
+   wget -T 1 -t 2 -O $target/etc/vlizedlab/rootkey/configkey.asc http://$host/configkey.asc
+   if [ $? = 0 -a -f $target/etc/vlizedlab/rootkey/configkey.asc ]; then
+       $ROOTCMD chown -Rf root.root /etc/vlizedlab/rootkey
+       $ROOTCMD chmod 700 /etc/vlizedlab/rootkey
+       $ROOTCMD chmod 600 /etc/vlizedlab/rootkey/configkey.asc
+
+       wget -T 1 -t 2 -O $target/etc/vlizedlab/config.tar.gz.asc http://$host/config.tar.gz.asc
+
+       TMPGDIR=$target/etc/vlizedlab/tmp
+       mkdir -p $TMPGDIR
+       chmod 700 $target/etc/vlizedlab/tmp
+       cat $target/etc/vlizedlab/rootkey/configkey.asc | gpg -q --homedir $TMPGDIR --import
+       gpg -q --homedir $TMPGDIR -d $target/etc/vlizedlab/config.tar.gz.asc > $target/etc/vlizedlab/config.tar.gz
+       if [ $? -ne 0 ]; then
+           rm $target/etc/vlizedlab/config.tar.gz.asc
+           rm $target/etc/vlizedlab/config.tar.gz
+           echo "OK. Root key found at http://$host/configkey.asc"
+           echo 'ERROR: http://$host/config.tar.gz.asc HAS WRONG SIGNATURE!!!'
+           $ROOTCMD chown -Rf root.root /etc/vlizedlab
+           exit 1
+       else
+           ( cd $target/etc/vlizedlab ; tar -xvzf $target/etc/vlizedlab/config.tar.gz )
+           rm $target/etc/vlizedlab/config.tar.gz.asc
+           rm -Rf $TMPGDIR
+           if [ -f $target/etc/vlizedlab/postinst ]; then
+               mv -v $target/etc/vlizedlab/postinst $target/etc/vlizedlab/postinst.notyet
+           fi
+           $ROOTCMD chown -Rf root.root /etc/vlizedlab
+           echo "OK. Root key found at http://$host/configkey.asc"
+           echo "OK. Configuration found at http://$host/config.tar.gz.asc"
+           exit 0
+       fi
+   fi
+
+done
+
+$ROOTCMD chown -Rf root.root /etc/vlizedlab
+
+echo "ERROR: BRANDING TO i-EDU ROOT SERVER FAILED"
+echo "ERROR: no /etc/vlidelab/rootkey/configkey.asc"
+
+exit 2
+

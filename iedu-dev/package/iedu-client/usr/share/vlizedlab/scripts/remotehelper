@@ -1,0 +1,111 @@
+#!/bin/bash
+
+VLCOMMON=/usr/share/vlizedlab/scripts/common
+if [ -f $VLCOMMON ]; then source $VLCOMMON ; else exit 1; fi
+
+_reset() {
+       kill `ps augx | egrep "/bin/bash $VLSCRIPTDIR/startmenu\$" | awk '{print $2}'` 2> /dev/null
+       kill `ps augx | egrep "/bin/bash $VLSCRIPTDIR/startmenumaint\$" | awk '{print $2}'` 2> /dev/null
+       kill `ps augx | grep 'udp-receiver' | grep -v grep | awk '{print $2}'` 2> /dev/null
+}
+
+_deletevm () {
+     if [ -d $1 ]; then
+        echo "Deleting  Virtual Machines $1 at `hostname`"
+	rm -vRf $1
+        echo "Deletion of Virtual Machines $1 done at `hostname`"
+     else 
+        echo "VM $1 does not exist. Not deleting anything at `hostname`"
+     fi
+}
+
+_blankblock () {
+  for i in `seq 3`; do
+    echo $'\n' $'\r' >> /dev/tty1
+  done
+}
+
+_clearscreen () {
+for i in `seq 120`; do
+   echo $'\n' $'\r' >> /dev/tty1
+ done
+#  clear >> /dev/tty1
+}
+
+_nl () {
+  echo $'\r' >> /dev/tty1
+}
+
+_initmaint () {
+  touch /tmp/maintlock
+#   _clearscreen
+  _reset
+  _clearscreen
+  # clear 2> /dev/null >> /dev/tty1
+  # echo '\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n'  >> /dev/tty1
+  echo "***************************************************************************"  >> /dev/tty1
+  _nl
+  echo "$VLTITLE"  >> /dev/tty1
+  _nl
+  echo "        ... performing maintenance task >>> $1 <<<"  >> /dev/tty1
+  _nl
+  echo "        ... please wait"  >> /dev/tty1 
+  _blankblock
+}
+
+_finishmaint () {
+   sleep 3
+   if [ -f /tmp/maintlock ]; then
+      rm /tmp/maintlock
+   fi
+   _reset
+} 
+
+
+echo "*** `hostname` performing - $*"
+
+case $1 in
+  echo)
+	# _initmaint $1
+	echo "Hello I am `hostname`!" 2>&1 # | tee -a /dev/tty1
+	# _finishmaint
+	;;
+  startvm)
+	su student -c "DISPLAY=:0 vlstartvbmachine $2"
+	;;
+  reset)
+        _initmaint $1
+        _finishmaint
+       ;;
+  reconfigure)
+	_initmaint $1	    
+	    echo 'Vlizedlab - Reconfigure'
+	    vlreconfig
+	_finishmaint
+	    ;;
+  update)
+	_initmaint $1	    
+	    echo 'Vlizedlab - Update'
+	    echo "     Update by upgrading package vlizedlab-client at `hostname`"
+	    apt-get update # 2>&1 | tee -a /dev/tty1
+	    apt-get -y install vlizedlab-client # 2>&1 | tee -a /dev/tty1
+	    echo "     Update by upgrading package vlizedlab-client at `hostname` done"
+	_finishmaint
+	    ;;
+  receivevm)
+	_initmaint $1
+        sleep 4
+	vludpreceiveVMs
+	_finishmaint
+    ;;
+  deletevm)
+	_initmaint $1
+	if [ "$2" != "" ]; then
+		_deletevm $2  2>&1 # e.g. /vm/vb/icslax
+	fi
+	_finishmaint
+    ;;
+  *) 
+    true
+    ;;
+esac

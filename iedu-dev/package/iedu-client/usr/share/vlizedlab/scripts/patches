@@ -1,0 +1,23 @@
+#!/bin/bash
+# Patches to newer version
+# must be redundant and small
+
+# dpkg-reconfigure -fnoninteractive locales
+
+adduser student audio # not necessary for new install cd
+
+if [ -d /media/mirror ]; then
+   rm -Rf /media/mirror
+fi
+
+if ! cmp -s /usr/share/polkit-1/actions/org.freedesktop.udisks.policy \
+            /usr/share/polkit-1/actions/save/org.freedesktop.udisks.policy.vl ; then
+
+     cp -vf /usr/share/polkit-1/actions/org.freedesktop.udisks.policy \
+            /usr/share/polkit-1/actions/save/org.freedesktop.udisks.policy.save
+
+     cp -vf /usr/share/polkit-1/actions/save/org.freedesktop.udisks.policy.vl \
+            /usr/share/polkit-1/actions/org.freedesktop.udisks.policy
+
+fi
+

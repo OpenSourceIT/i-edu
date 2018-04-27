@@ -1,0 +1,58 @@
+#!/bin/bash
+
+VLIZEDETC=/etc/vlizedlab
+VLIZEDROOTFILE=$VLIZEDETC/vlizedroot
+TMPGDIR=$VLIZEDETC/tmp
+
+WGETOPTS="-T 2 -t 1"
+
+_clean () {
+   if [ -f $VLIZEDETC/config.tar.gz.asc ]; then
+        rm -f $VLIZEDETC/config.tar.gz.asc
+   fi
+   if [ -d $TMPGDIR ]; then
+        rm -Rf $TMPGDIR
+   fi
+   chmod 700 $VLIZEDETC/rootkey
+   chmod 600 $VLIZEDETC/rootkey/*
+   chown -Rf root.root $VLIZEDETC
+}
+
+
+for host in `cat /etc/vlizedlab/vlizedroot | grep -v '^#'` ; do
+
+   echo "Trying http://$host/config.tar.gz.asc"
+   wget $WGETOPTS -O $VLIZEDETC/config.tar.gz.asc http://$host/config.tar.gz.asc
+   if [ $? -ne 0 ]; then
+        _clean
+   else
+       echo "Found config in http://$host/config.tar.gz.asc"
+       mkdir -p $TMPGDIR
+       chmod 700 $TMPGDIR
+       cat $VLIZEDETC/rootkey/configkey.asc | gpg -q --homedir $TMPGDIR --import
+       mv $VLIZEDETC/config.tar.gz $VLIZEDETC/config.tar.gz.old
+       gpg -q --homedir $TMPGDIR -d $VLIZEDETC/config.tar.gz.asc > $VLIZEDETC/config.tar.gz
+       if [ $? -ne 0 ]; then
+           mv $VLIZEDETC/config.tar.gz.old $VLIZEDETC/config.tar.gz
+           _clean
+           echo "ERROR WRONG SIGNATURE found in http://$host/config.tar.gz.asc!!!"
+           _clean
+       else
+           echo "OK. Correctly signed configuration found in http://$host/config.tar.gz.asc"
+           rm $VLIZEDETC/config.tar.gz.old
+           ( cd $VLIZEDETC ; tar -xvzf $VLIZEDETC/config.tar.gz )
+           echo 'Executing post-installation script'
+           $VLIZEDETC/postinst
+           echo 'OK. Finished'
+           _clean
+           exit 0
+       fi
+
+   fi
+
+done
+
+_clean
+echo "ERROR: No valid new configuration found; keeping the old one."
+exit 1
+

@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+STAT_FILE="/tmp/beamer"
+
+if [ -f "$STAT_FILE" ]
+then
+  rm $STAT_FILE
+  echo "aus"
+  xrandr --output $1 --off
+else
+  echo "ein" > $STAT_FILE
+  xrandr --output $1 --off
+  xrandr --output $1 --auto
+fi

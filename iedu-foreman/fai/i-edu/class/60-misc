@@ -1,0 +1,4 @@
+#! /bin/bash
+
+# is done in 50-host-classes
+# ifclass -o I386 AMD64 && echo GRUB_PC

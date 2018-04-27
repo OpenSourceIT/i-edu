@@ -1,0 +1,91 @@
+#!/bin/bash
+
+VLCOMMON=/usr/share/vlizedlab/scripts/common
+if [ -f $VLCOMMON ]; then source $VLCOMMON ; 
+   TITLE="VlizedlabClient (c)the-M `_version` - `hostname`"
+else
+   TITLE="VlizedlabClient (c)the-M - `hostname`"
+fi
+
+
+RESFILE=$HOME/vlXresolution
+export DISPLAY=:0.0
+
+THISSCRIPT=$0
+
+_usage () {
+   echo "Usage: `basename $0` auto"
+   echo "       `basename $0` <X>x<Y>"
+   echo "       `basename $0` menu"
+   echo "       `basename $0` -h"
+}
+
+
+_resetresolution () {
+     echo "Resetting Resolution to default"
+     xrandr -s 0 2>&1 | logger
+     killall ion3
+     ion3 &
+}
+
+_setresolution () {
+    echo "Setting Resolution to $1"
+    xrandr -s $1 2>&1 > logger
+    killall ion3
+    ion3 &
+}
+
+_resolutionmenu () {
+	echo "Resolution Menu"
+	RESLIST="`xrandr -q | awk 'BEGIN {f=0} /[^a-z]connected/ {f=1} /disconnected/ {f=0} /^[^a-z0-9]*[0-9][0-9]*x[0-9][0-9]*/ { if (f==1) print $1}'`"
+#    echo "Resolution list is: $RESLIST"
+
+	MENU="auto _"
+
+	for R in $RESLIST ; do
+	   MENU="$MENU $R _"
+	done
+
+	choice=`dialog --cr-wrap \
+                  --backtitle "$TITLE" \
+	          --menu 'Choose Screen Resolution:' 0 0 0 $MENU 3>&1 1>&2 2>&3`
+
+	clear
+
+	$THISSCRIPT $choice
+
+}
+
+_resolutionauto () {
+    if [ -f $RESFILE ]; then
+      RESOLUTION="`cat $RESFILE | egrep -v '^#' | egrep '^[ \t]*[0-9][0-9]*x[0-9][0-9]' | head -1`"
+		# todo: care for the end of the line in RESOLUTION
+      if [ "$RESOLUTION" != "" ]; then
+        _setresolution $RESOLUTION
+      else
+        _resetresolution
+      fi
+    else
+       _resetresolution
+    fi
+}
+
+
+case "$1" in 
+  "auto")
+    _resolutionauto
+    ;;
+
+  [0-9][0-9]*x[0-9][0-9]*)
+      _setresolution $1
+    ;;
+
+  menu)
+    _resolutionmenu
+    ;;
+
+  *|-h)
+    _usage
+    ;;
+esac
+

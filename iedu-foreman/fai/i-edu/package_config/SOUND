@@ -1,0 +1,10 @@
+#########################
+
+PACKAGES aptitude
+alsa-base
+alsa-oss
+alsa-tools
+alsa-utils
+sox
+# alsa-mixer
+

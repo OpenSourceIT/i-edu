@@ -1,0 +1,19 @@
+# example of new config file for setup-storage
+#
+# <type> <mountpoint> <size>   <fs type> <mount options> <misc options>
+#
+#disk_config disk1 disklabel:msdos bootable:1 fstabkey:uuid
+#
+#primary /      2G-15G   ext4  rw,noatime,errors=remount-ro
+#logical swap   200-1G   swap  sw
+#logical /tmp   100-1G   ext4  rw,noatime,nosuid,nodev createopts="-L tmp -m 0" tuneopts="-c 0 -i 0"
+#logical /home  100-50%  ext4  rw,noatime,nosuid,nodev createopts="-L home -m 1" tuneopts="-c 0 -i 0"
+
+#disk_config disk1 preserve_lazy:3 disklabel:msdos bootable:1 fstabkey:uuid
+disk_config disk1 disklabel:msdos bootable:1 fstabkey:uuid
+
+primary /      8G-12G    ext4  rw,noatime,errors=remount-ro
+primary swap   1000-2000 swap  sw
+primary /vm    50%-      xfs   rw,nodev
+#primary /vm    100-50%   xfs   rw,nodev
+

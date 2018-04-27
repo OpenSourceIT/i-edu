@@ -1,0 +1,25 @@
+#!/bin/bash
+# start this script for a student logging in
+
+################################
+# Adaptions, Bugfixes
+
+if [ -x /usr/bin/amixer ]; then
+   amixer sset Master playback 99%
+fi
+
+################################
+
+if [ ! -d $HOME/.ion3 ]; then
+   cp -Rvf /etc/skel/.ion3 $HOME
+fi
+
+if [ -d $HOME/.ion3/default-session--0 ]; then
+    rm -Rf $HOME/.ion3/default-session--0
+fi
+
+vlinitvbox
+
+/usr/bin/X11/startx
+
+

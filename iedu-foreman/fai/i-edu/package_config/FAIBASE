@@ -1,0 +1,21 @@
+PACKAGES aptitude UBUNTU_1604_LTS
+fai-client
+cron
+debconf-utils
+file
+less
+linuxlogo
+rdate
+rsync
+openssh-client openssh-server
+strace
+time
+procinfo
+nullmailer
+eject
+locales
+console-setup kbd
+pciutils usbutils
+squashfs-tools
+aufs-tools
+

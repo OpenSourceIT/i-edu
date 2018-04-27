@@ -1,0 +1,13 @@
+# Konfigurationsdateien für VMs können hier abgelegt werden
+# Die Konfigurationsdatei muss den Namen "vm-[vm-name]" haben, zB für die Virtualbox VM "windows7" muss die Konfigurationsdatei "vm-windows7" heißen
+#
+# Als Parameter können gesetzt werden:
+#  network = nat | bridged
+#  macaddr = MAC-Adresse
+#  bridgeadapter = Interface für die Bridge
+#
+# zB.
+#
+#network=bridged
+#macaddr=1234
+#bridgeadapter=eth0

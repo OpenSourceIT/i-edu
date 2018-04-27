@@ -1,0 +1,28 @@
+PACKAGES aptitude UBUNTU_1604_LTS
+xorg xserver-xorg-video-all xserver-xorg-input-all
+ttf-freefont
+# xscreensaver
+# xscreensaver-gl
+xterm
+desktop-base
+i3 i3-wm i3status
+# fluxbox
+libgl1-mesa-glx
+libgl1-mesa-dri
+
+#xserver-xorg synaptic xinit xterm x11-xserver-utils
+#xserver-xorg-video-all xserver-xorg-input-all
+## ttf-freefont
+## xscreensaver
+## xscreensaver-gl
+#fluxbox
+#libgl1-mesa-glx
+#libgl1-mesa-dri
+#mesa-utils
+#xfonts-base
+#xfonts-100dpi
+#xfonts-75dpi
+#xfonts-encodings
+#xfonts-scalable
+#xfonts-utils 
+

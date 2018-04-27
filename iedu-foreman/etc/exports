@@ -1,0 +1,3 @@
+/export		*(acl,async,no_subtree_check,fsid=0,ro)
+/home/nfsroot   *(ro,no_root_squash,sync,no_subtree_check)
+/var/www/pxe    *(ro,no_root_squash,sync,no_subtree_check)

@@ -1,0 +1,36 @@
+Package: *
+Pin: release a=stable
+Pin-Priority: 600
+
+Package: puppet
+Pin: release a=stable
+Pin-Priority: 801
+
+Package: puppet-common
+Pin: release a=stable
+Pin-Priority: 801
+
+Package: *
+Pin: release a=testing
+Pin-Priority: 800
+
+Package: *
+Pin: release a=unstable
+Pin-Priority: 505
+
+Package: *
+Pin: release a=oldstable
+Pin-Priority: 501
+
+Package: *
+Pin: release o=Debian
+Pin-Priority: -10
+
+Package: *
+Pin: origin debutil.the-m.at
+Pin-Priority: 801
+
+Package: *
+Pin: origin 10.70.100.250
+Pin-Priority: 810
+

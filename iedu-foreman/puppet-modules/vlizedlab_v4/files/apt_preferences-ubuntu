@@ -1,0 +1,12 @@
+Package: virtualbox virtualbox-dkms virtualbox-qt puppet puppet-common
+Pin: release a=xenial-updates
+Pin-Priority: 900
+
+Package: *
+Pin: origin debutil.the-m.at
+Pin-Priority: 801
+
+Package: *
+Pin: origin 10.70.100.250
+Pin-Priority: 810
+

@@ -1,0 +1,31 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+
+override_dh_auto_install:
+	mkdir -p debian/iedu-client/usr
+	mkdir -p debian/iedu-client/etc
+	cp -a usr/* debian/iedu-client/usr/.
+	cp -a etc/* debian/iedu-client/etc/.
+	cp -a ../../vl_vm_action.py debian/iedu-client/usr/bin/.
+	cp -a ../../browser.png debian/iedu-client/usr/share/vlizedlab/.
+	cp -a ../../default.png debian/iedu-client/usr/share/vlizedlab/.
+	cp -a ../../exit.png debian/iedu-client/usr/share/vlizedlab/.
+	cp -a ../../linux.png debian/iedu-client/usr/share/vlizedlab/.
+	cp -a ../../menu.ui debian/iedu-client/usr/share/vlizedlab/.
+	cp -a ../../menu-firstboot.ui debian/iedu-client/usr/share/vlizedlab/.
+	cp -a ../../menu-copycd.ui debian/iedu-client/usr/share/vlizedlab/.
+	cp -a ../../teamviewer.png debian/iedu-client/usr/share/vlizedlab/.
+	cp -a ../../terminal.png debian/iedu-client/usr/share/vlizedlab/.
+	cp -a ../../volume-high.png debian/iedu-client/usr/share/vlizedlab/.
+	cp -a ../../volume-low.png debian/iedu-client/usr/share/vlizedlab/.
+	cp -a ../../windows.png debian/iedu-client/usr/share/vlizedlab/.
+	cp -a ../../usbdrive.png debian/iedu-client/usr/share/vlizedlab/.
+	cp -a ../../beamer.png debian/iedu-client/usr/share/vlizedlab/.
+	cp -a ../../cd.png debian/iedu-client/usr/share/vlizedlab/.
+	cp -a ../../world.gif debian/iedu-client/usr/share/vlizedlab/.
+	cp -a ../../startmenufirstboot.py debian/iedu-client/usr/share/vlizedlab/scripts/.
+	cp -a ../../startmenustudentgui.py debian/iedu-client/usr/share/vlizedlab/scripts/.
+	cp -a ../../startmenustudent_copycd.py debian/iedu-client/usr/share/vlizedlab/scripts/.
+	cp -a ../../automount_usb2vb.py debian/iedu-client/usr/share/vlizedlab/scripts/.

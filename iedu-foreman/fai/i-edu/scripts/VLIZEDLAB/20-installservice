@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# error=0 ; trap "error=$((error|1))" ERR
+
+fcopy -m root,root,0744 /etc/startmenu1.sh
+#fcopy -m root,root,0744 /etc/startmenu2.sh
+
+fcopy -M /etc/systemd/system/startty1.service
+#fcopy -M /etc/systemd/system/startty2.service
+
+ln -vs /etc/systemd/system/startty1.service $target/etc/systemd/system/multi-user.target.wants/startty1.service
+#ln -vs /etc/systemd/system/startty2.service $target/etc/systemd/system/multi-user.target.wants/startty2.service
+
+if [ -f $target/etc/systemd/system/getty.target.wants/getty@tty1.service ]; then
+   mv -v $target/etc/systemd/system/getty.target.wants/getty@tty1.service \
+         $target/etc/systemd/system/getty.target.wants/getty@tty3.service 
+fi
+
+# exit $error
+
